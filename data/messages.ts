@@ -61,6 +61,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 suggestions: [
                     { label: 'Create PR' },
                 ],
+                thought_duration_ms: 92000,
             },
         ],
     },
@@ -79,6 +80,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-14T10:00:05+00:00',
                 id: 'msg-0001-02',
                 role: 'agent',
+                thought_duration_ms: 3000,
             },
             {
                 content: 'Can it work with my existing jobs?',
@@ -92,6 +94,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-14T10:04:00+00:00',
                 id: 'msg-0001-04',
                 role: 'agent',
+                thought_duration_ms: 4000,
             },
         ],
     },
@@ -110,6 +113,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-14T14:00:05+00:00',
                 id: 'msg-0002-02',
                 role: 'agent',
+                thought_duration_ms: 4000,
             },
             {
                 content: 'Does it require me to be online?',
@@ -123,6 +127,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-14T14:05:00+00:00',
                 id: 'msg-0002-04',
                 role: 'agent',
+                thought_duration_ms: 3000,
             },
         ],
     },
@@ -141,6 +146,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-15T09:00:05+00:00',
                 id: 'msg-0003-02',
                 role: 'agent',
+                thought_duration_ms: 3000,
             },
             {
                 content: "Let's start with jobs tagged `sales` and `marketing`.",
@@ -154,6 +160,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-15T09:04:00+00:00',
                 id: 'msg-0003-04',
                 role: 'agent',
+                thought_duration_ms: 8000,
             },
             {
                 content: 'Looks good, enable it.',
@@ -167,6 +174,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-15T09:08:00+00:00',
                 id: 'msg-0003-06',
                 role: 'agent',
+                thought_duration_ms: 5000,
             },
         ],
     },
@@ -179,6 +187,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T06:00:00+00:00',
                 id: 'msg-0004-01',
                 role: 'agent',
+                thought_duration_ms: 38000,
             },
             {
                 content: 'Which columns specifically?',
@@ -192,6 +201,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T06:05:05+00:00',
                 id: 'msg-0004-03',
                 role: 'agent',
+                thought_duration_ms: 18000,
             },
             {
                 content: 'Can you generate a diff for removing them?',
@@ -208,6 +218,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 suggestions: [
                     { label: 'Create PR' },
                 ],
+                thought_duration_ms: 14000,
             },
         ],
     },
@@ -220,6 +231,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T06:05:00+00:00',
                 id: 'msg-0005-01',
                 role: 'agent',
+                thought_duration_ms: 42000,
             },
             {
                 content: 'Any breaking changes I should know about?',
@@ -233,6 +245,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T06:10:05+00:00',
                 id: 'msg-0005-03',
                 role: 'agent',
+                thought_duration_ms: 22000,
             },
             {
                 content: 'Yes, show me.',
@@ -249,6 +262,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 suggestions: [
                     { label: 'Create PR' },
                 ],
+                thought_duration_ms: 12000,
             },
         ],
     },
@@ -261,6 +275,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T07:30:00+00:00',
                 id: 'msg-0006-01',
                 role: 'agent',
+                thought_duration_ms: 48000,
             },
             {
                 content: 'Who made that change?',
@@ -274,6 +289,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T07:35:05+00:00',
                 id: 'msg-0006-03',
                 role: 'agent',
+                thought_duration_ms: 11000,
             },
             {
                 content: 'Can we cast the column in the jobs instead of reverting the schema?',
@@ -287,6 +303,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T07:42:00+00:00',
                 id: 'msg-0006-05',
                 role: 'agent',
+                thought_duration_ms: 9000,
             },
         ],
     },
@@ -299,6 +316,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T08:15:00+00:00',
                 id: 'msg-0007-01',
                 role: 'agent',
+                thought_duration_ms: 32000,
             },
             {
                 content: "What's causing the delay?",
@@ -312,6 +330,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T08:20:05+00:00',
                 id: 'msg-0007-03',
                 role: 'agent',
+                thought_duration_ms: 21000,
             },
             {
                 content: 'Is the Kafka issue resolved?',
@@ -325,6 +344,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T08:25:00+00:00',
                 id: 'msg-0007-05',
                 role: 'agent',
+                thought_duration_ms: 7000,
             },
         ],
     },
@@ -337,6 +357,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T09:00:00+00:00',
                 id: 'msg-0008-01',
                 role: 'agent',
+                thought_duration_ms: 36000,
             },
             {
                 content: 'Was it dropped intentionally?',
@@ -350,6 +371,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T09:04:05+00:00',
                 id: 'msg-0008-03',
                 role: 'agent',
+                thought_duration_ms: 13000,
             },
             {
                 content: 'Update the reference and re-run.',
@@ -363,6 +385,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
                 created_at: '2026-04-20T09:10:00+00:00',
                 id: 'msg-0008-05',
                 role: 'agent',
+                thought_duration_ms: 9000,
             },
         ],
     },
@@ -387,6 +410,7 @@ I analyzed the Spark execution plan and found 6 compounding performance issues. 
                     { label: 'Show full analysis' },
                     { label: 'Create PR with fix' },
                 ],
+                thought_duration_ms: 118000,
             },
             {
                 content: "Can't the job just run earlier to make the 9 AM deadline?",
@@ -406,6 +430,7 @@ The real problem is the job itself: it's gotten nearly 9x slower over the last 5
                     { label: 'Show full analysis' },
                     { label: 'Create PR with fix' },
                 ],
+                thought_duration_ms: 14000,
             },
             {
                 content: "How did you even find this issue? The job didn't fail.",
@@ -434,6 +459,7 @@ This is a gradual degradation, not a sudden failure — which is why no alerts f
                 suggestions: [
                     { label: 'Create PR with fix' },
                 ],
+                thought_duration_ms: 26000,
             },
             {
                 content: "What changed? This job used to finish on time.",
@@ -456,6 +482,7 @@ Each change passed code review individually. The performance cliff came from the
                 suggestions: [
                     { label: 'Create PR with fix' },
                 ],
+                thought_duration_ms: 44000,
             },
         ],
     },
