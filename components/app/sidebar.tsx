@@ -31,7 +31,8 @@ export function Sidebar({
          }, {
             href: '/search/discover',
             icon: CompassIcon,
-            label: 'Discover'
+            label: 'Discover',
+            tag: 'Beta'
          }, {
             href: '/marketplace',
             icon: StorefrontIcon,
@@ -118,7 +119,8 @@ export function Sidebar({
             className?: string,
             href: string,
             icon: React.ElementType,
-            label: string
+            label: string,
+            tag?: string
         }[],
         label?: string
     }[]
@@ -151,6 +153,11 @@ export function Sidebar({
                         >
                               <item.icon className={cn('text-[rgb(111,111,111)]! dark:text-[rgb(146,164,179)]! group-hover/item:text-[rgb(14,83,139)]! dark:group-hover/item:text-[rgb(138,202,255)]! size-4', item.className)} />
                               <span>{item.label}</span>
+                              {item.tag && (
+                                 <span className="bg-[rgb(22,22,22)]/5 dark:bg-[rgb(232,236,240)]/8 rounded-[4px] text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] inline-flex px-1.5 py-0.5">
+                                    <span className="min-w-0 truncate">{item.tag}</span>
+                                 </span>
+                              )}
                         </Link>
                      ))}
                   </div>
