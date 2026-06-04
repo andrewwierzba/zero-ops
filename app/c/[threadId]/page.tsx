@@ -2,7 +2,9 @@
 
 import { use, useState } from 'react'
 
-import { ChevronRightIcon, ChevronsLeftIcon, CornerDownLeftIcon, GitForkIcon, PlusIcon, SettingsIcon, ShareIcon, WorkflowIcon, XIcon } from 'lucide-react'
+import { ReplyIcon } from '@databricks/design-system'
+import { ChevronsLeftIcon, GitForkIcon, PlusIcon, SettingsIcon, ShareIcon, XIcon } from 'lucide-react'
+
 import { useRouter } from 'next/navigation'
 import { usePanelRef } from 'react-resizable-panels'
 
@@ -13,6 +15,7 @@ import { PanelRightOpenIcon } from '@/app/assets/icons/panel-right-open'
 import { ApplicationContent, ApplicationShell } from '@/components/app/application-shell'
 import { Chatbox } from '@/components/app/chatbox'
 import { CodeBlock } from '@/components/app/code-block'
+import { Graph } from '@/components/app/graph'
 import Threads from '@/components/app/threads'
 import { useThreads } from '@/components/app/threads-context'
 
@@ -287,14 +290,21 @@ function Page({ params }: PageProps) {
                                                     key={message.id}
                                                 >
                                                     {message.role === 'user' ? (
-                                                        <div className="rounded-2xl px-4 py-2.5 text-sm max-w-prose bg-blue-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+                                                        <div className="rounded-2xl px-4 py-2.5 text-sm bg-blue-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+                                                            {/* Removed: max-w-prose */}
                                                             {message.content}
                                                         </div>
                                                     ) : (
-                                                        <div className="flex flex-col gap-2 text-sm max-w-prose w-full">
+                                                        <div className="flex flex-col gap-2 text-sm w-full">
+                                                            {/* Removed: max-w-prose */}
                                                             {message.thought_duration_ms != null && (
                                                                 <div className="text-muted-foreground text-xs">
                                                                     {formatThoughtDuration(message.thought_duration_ms)}
+                                                                </div>
+                                                            )}
+                                                            {message.embed === 'graph' && (
+                                                                <div className="border rounded-md overflow-hidden h-64">
+                                                                    <Graph className="h-full" />
                                                                 </div>
                                                             )}
                                                             <div className="flex flex-col gap-3">
@@ -302,14 +312,35 @@ function Page({ params }: PageProps) {
                                                             </div>
                                                             {message.id === latestActionMessageId && message.actions && message.actions.length > 0 && (
                                                                 <div className="flex flex-wrap gap-2 pt-1">
+                                                                    <svg aria-hidden className="absolute" height="0" width="0">
+                                                                        <defs>
+                                                                            <linearGradient
+                                                                                gradientUnits="userSpaceOnUse"
+                                                                                id="reply-icon-gradient"
+                                                                                x1="-1.16831"
+                                                                                x2="12.4619"
+                                                                                y1="1.18452"
+                                                                                y2="18.6312"
+                                                                            >
+                                                                                <stop offset="0.235" stopColor="#4299E0" />
+                                                                                <stop offset="0.47" stopColor="#CA42E0" />
+                                                                                <stop offset="0.76" stopColor="#FF5F46" />
+                                                                            </linearGradient>
+                                                                        </defs>
+                                                                    </svg>
                                                                     {message.actions.map((action) => (
                                                                         <Button
-                                                                            className="w-fit items-center gap-1.5"
+                                                                            className="items-center rounded-[12px] rounded-tl-none gap-1.5 w-fit"
                                                                             key={action.label}
                                                                             variant="secondary"
                                                                         >
+                                                                            <ReplyIcon
+                                                                                className="[&_g_path]:[fill:url(#reply-icon-gradient)]"
+                                                                                onPointerEnterCapture={() => {}}
+                                                                                onPointerLeaveCapture={() => {}}
+                                                                                size={3.5}
+                                                                            />
                                                                             <span>{action.label}</span>
-                                                                            <CornerDownLeftIcon size={3.5} />
                                                                         </Button>
                                                                     ))}
                                                                 </div>
