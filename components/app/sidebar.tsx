@@ -119,7 +119,7 @@ export function Sidebar({
 }) {
    return (
       <div className="flex flex-col group min-h-0 min-w-50 self-stretch">
-         <div aria-label="Sidebar" className="items-center flex flex-1 flex-col text-sm min-h-0 overflow-y-auto px-3 py-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-200 dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+         <div aria-label="Sidebar" className="items-center flex flex-1 flex-col text-sm min-h-0 overflow-y-auto px-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-200 dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
             <span className="items-center bg-red-100 dark:bg-red-950 border border-red-200 dark:border-red-950 rounded-sm flex font-medium gap-2 mb-2 px-3 py-1.5 w-full">
                   <PlusIcon className="text-red-500 size-4" />
                   <span>New</span>
