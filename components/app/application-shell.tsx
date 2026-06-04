@@ -54,7 +54,7 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
                     <span className="font-medium text-sm">Databricks App</span>
                 </div>
                 <div className="flex-1">
-                    <InputGroup className="bg-background rounded-[4px] flex-1 justify-self-center max-w-100">
+                    <InputGroup className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)] rounded-[4px] flex-1 justify-self-center max-w-140">
                         <InputGroupAddon align="inline-start">
                             <InputGroupText>
                                 <SearchIcon
