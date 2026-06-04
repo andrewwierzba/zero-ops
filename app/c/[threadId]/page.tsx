@@ -173,9 +173,8 @@ function Page({ params }: PageProps) {
     const thread = threads.find((t) => t.id === threadId)
     const threadMessages = messages[threadId] ?? []
     const threadThinking = thinking[threadId] ?? null
-    const latestAgentMessageId = [...threadMessages]
-        .reverse()
-        .find((message) => message.role === 'agent')?.id
+    const lastMessage = threadMessages[threadMessages.length - 1]
+    const latestAgentMessageId = lastMessage?.role === 'agent' ? lastMessage.id : undefined
 
     const [showAutomationPanel, setShowAutomationPanel] = useState(false)
     const [showIncidentPanel, setShowIncidentPanel] = useState(false)
@@ -363,6 +362,7 @@ function Page({ params }: PageProps) {
                                                                         <Button
                                                                             className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none gap-1.5 w-fit"
                                                                             key={suggestion.label}
+                                                                            onClick={() => handleSubmit(suggestion.label)}
                                                                             variant="secondary"
                                                                         >
                                                                             <ReplyIcon
