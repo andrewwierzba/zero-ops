@@ -122,7 +122,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                                 <span className="shrink-0 size-2">
                                     {thread.status && <span className={`rounded-full ${STATUS_DOT_CLASS[thread.status]} block size-2`} />}
                                 </span>
-                                <span className="text-[13px] font-normal truncate">{thread.label}</span>
+                                <span className="text-[13px] font-normal text-left truncate w-full">{thread.label}</span>
                                 <span aria-describedby="Last updated" className="text-muted-foreground text-xs mt-0.5">
                                     2m
                                 </span>
