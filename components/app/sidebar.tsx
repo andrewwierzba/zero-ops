@@ -1,6 +1,10 @@
-import Link from "next/link"
+import Link from 'next/link'
 
-import { BellIcon, BotIcon, BrainIcon, ClockIcon, CloudIcon, CompassIcon, DatabaseIcon, DownloadIcon, FileCodeIcon, FlaskConicalIcon, HistoryIcon, LayoutDashboardIcon, ListChecksIcon, NotebookIcon, PackageIcon, PlusIcon, RadioIcon, ShapesIcon, SparkleIcon, SparklesIcon, SquareTerminalIcon, StoreIcon, WandIcon, WorkflowIcon } from "lucide-react"
+import { cn } from '@/lib/utils'
+
+import { CompassIcon } from 'lucide-react'
+
+import { BeakerIcon, CatalogIcon, ChecklistIcon, ClockIcon, CloudDatabaseIcon, CloudIcon, CloudModelIcon, DashboardIcon, DataIcon, DatabaseIcon, HistoryIcon, IngestionIcon, LayerIcon, ModelsIcon, NotebookIcon, NotificationIcon, PlusIcon, QueryEditorIcon, QueryIcon, RadioIcon, RobotIcon, SparkleDoubleIcon, SparkleIcon, SparkleRectangleIcon, StorefrontIcon, UserSparkleIcon, WorkflowsIcon, WorkspacesIcon } from '@databricks/design-system'
 
 export function Sidebar({
     groups = [{
@@ -14,11 +18,11 @@ export function Sidebar({
             label: 'Recents'
          }, {
             href: '/explore/data',
-            icon: ShapesIcon,
+            icon: DataIcon,
             label: 'Catalog'
          }, {
             href: '/jobs',
-            icon: WorkflowIcon,
+            icon: WorkflowsIcon,
             label: 'Jobs & Pipelines'
          }, {
             href: '/compute/interactive',
@@ -30,30 +34,30 @@ export function Sidebar({
             label: 'Discover'
          }, {
             href: '/marketplace',
-            icon: StoreIcon,
+            icon: StorefrontIcon,
             label: 'Marketplace'
          }]
     }, {
         label: 'SQL',
         items: [{
             href: '/editor/queries',
-            icon: SquareTerminalIcon,
+            icon: QueryEditorIcon,
             label: 'SQL Editor'
          }, {
             href: '/sql/queries',
-            icon: FileCodeIcon,
+            icon: QueryIcon,
             label: 'Queries'
          }, {
             href: '/sql/dashboards',
-            icon: LayoutDashboardIcon,
+            icon: DashboardIcon,
             label: 'Dashboards'
          }, {
             href: '/genie',
-            icon: SparkleIcon,
+            icon: SparkleRectangleIcon,
             label: 'Genie'
          }, {
             href: '/sql/alerts',
-            icon: BellIcon,
+            icon: NotificationIcon,
             label: 'Alerts'
          }, {
             href: '/sql/history',
@@ -61,55 +65,57 @@ export function Sidebar({
             label: 'Query History'
          }, {
             href: '/compute/sql-warehouses',
-            icon: DatabaseIcon,
+            icon: CloudDatabaseIcon,
             label: 'SQL Warehouses'
          }]
     }, {
         label: 'Data Engineering',
         items: [{
             href: '/jobs/runs',
-            icon: ListChecksIcon,
+            icon: ChecklistIcon,
             label: 'Runs'
          }, {
             href: '/ingestion/add',
-            icon: DownloadIcon,
+            icon: IngestionIcon,
             label: 'Data Ingestion'
          }]
     }, {
         label: 'AI/ML',
         items: [{
             href: '/ml/playground',
-            icon: SparklesIcon,
+            icon: SparkleDoubleIcon,
             label: 'Playground'
          }, {
             href: '/ml/bricks',
-            icon: BotIcon,
+            icon: UserSparkleIcon,
             label: 'Agents'
          }, {
+            className: 'rotate-270',
             href: '/ml/ai-gateway',
-            icon: WandIcon,
+            icon: IngestionIcon,
             label: 'AI Gateway'
          }, {
             href: '/ml/experiments',
-            icon: FlaskConicalIcon,
+            icon: BeakerIcon,
             label: 'Experiments'
          }, {
             href: '/feature-store',
-            icon: PackageIcon,
+            icon: LayerIcon,
             label: 'Features'
          }, {
             href: '/ml/models',
-            icon: BrainIcon,
+            icon: ModelsIcon,
             label: 'Models'
          }, {
             href: '/ml/endpoints',
-            icon: RadioIcon,
+            icon: CloudModelIcon,
             label: 'Serving'
          }]
     }]
 }: {
     groups?: {
         items: {
+            className?: string,
             href: string,
             icon: React.ElementType,
             label: string
@@ -119,9 +125,13 @@ export function Sidebar({
 }) {
    return (
       <div className="flex flex-col group min-h-0 min-w-50 self-stretch">
-         <div aria-label="Sidebar" className="items-center flex flex-1 flex-col text-sm min-h-0 overflow-y-auto px-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-200 dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+         <div aria-label="Sidebar" className="items-center flex flex-1 flex-col text-[13px] min-h-0 overflow-y-auto px-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-200 dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
             <span className="items-center bg-red-100 dark:bg-red-950 border border-red-200 dark:border-red-950 rounded-sm flex font-medium gap-2 mb-2 px-3 py-1.5 w-full">
-                  <PlusIcon className="text-red-500 size-4" />
+                  <PlusIcon
+                     className="text-[rgb(255,73,73)]! size-4"
+                     onPointerEnterCapture={() => {}}
+                     onPointerLeaveCapture={() => {}}
+                  />
                   <span>New</span>
             </span>
 
@@ -135,11 +145,11 @@ export function Sidebar({
                      {group.items.map((item, itemIndex) => (
                         <Link
                               aria-label="Sidebar item"
-                              className="items-center rounded-sm flex gap-2 px-3 py-1.5 w-full hover:bg-[rgb(34,114,180)]/10 dark:hover:bg-[rgb(64,152,224)]/20"
+                              className="items-center hover:bg-[rgb(34,114,180)]/10 dark:hover:bg-[rgb(64,152,224)]/20 rounded-[4px] text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] flex gap-2 group/item px-3 py-1.5 w-full"
                               href={item.href}
                               key={itemIndex}
                         >
-                              <item.icon className="text-muted-foreground size-4" />
+                              <item.icon className={cn('text-[rgb(111,111,111)]! dark:text-[rgb(146,164,179)]! group-hover/item:text-[rgb(14,83,139)]! dark:group-hover/item:text-[rgb(138,202,255)]! size-4', item.className)} />
                               <span>{item.label}</span>
                         </Link>
                      ))}
