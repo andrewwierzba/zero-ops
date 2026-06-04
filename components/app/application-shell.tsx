@@ -60,14 +60,6 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
                 </div>
                 <div aria-label="Application actions" className="items-center flex gap-1">
                     <Button
-                        aria-label="Open app switcher"
-                        className="group"
-                        size="icon"
-                        variant="ghost"
-                    >
-                        <GripIcon />
-                    </Button>
-                    <Button
                         aria-label="Open Genie Code"
                         className="border-none group"
                         size="icon"
@@ -75,6 +67,14 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
                         variant="ghost"
                     >
                         <GenieCodeIcon />
+                    </Button>
+                    <Button
+                        aria-label="Open app switcher"
+                        className="group"
+                        size="icon"
+                        variant="ghost"
+                    >
+                        <GripIcon />
                     </Button>
                     <Button
                         aria-label="Open profile"
