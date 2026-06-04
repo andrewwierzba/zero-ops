@@ -20,7 +20,7 @@ import { GenieCodeIcon } from '@/app/assets/icons/genie-code'
 
 function ApplicationContent({ children }: { children: React.ReactNode }) {
     return (
-        <div className="flex flex-1 min-h-0 min-w-0 pb-1 pr-1">
+        <div className="flex flex-1 min-h-0 min-w-0 pb-1 px-1">
             <div className="bg-background border rounded-md flex flex-1 overflow-hidden">
                 {children}
             </div>
