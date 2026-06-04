@@ -126,7 +126,7 @@ export function Sidebar({
    return (
       <div className="flex flex-col group min-h-0 min-w-50 self-stretch">
          <div aria-label="Sidebar" className="items-center flex flex-1 flex-col text-[13px] min-h-0 overflow-y-auto pl-3 pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-200 dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
-            <span className="items-center bg-red-100 dark:bg-red-950 border border-red-200 dark:border-red-950 rounded-sm flex font-medium gap-2 mb-2 px-3 py-1.5 w-full">
+            <span className="items-center bg-[rgb(255,73,73)]/8 border border-[rgb(255,73,73)]/8 rounded-md flex font-semibold gap-2 h-10 mb-2 px-3 py-1.5 shrink-0 w-full">
                   <PlusIcon
                      className="text-[rgb(255,73,73)]! size-4"
                      onPointerEnterCapture={() => {}}
