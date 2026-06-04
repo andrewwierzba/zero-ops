@@ -8,9 +8,13 @@ export interface ScenarioThoughtStep {
 
 export interface ScenarioStep {
     promptMatch: string
-    thoughtDurationMs: number
+    reply: {
+        actions?: MessageAction[];
+        content: string;
+        suggestions?: MessageAction[];
+    }
     steps?: ScenarioThoughtStep[]
-    reply: { content: string; actions?: MessageAction[] }
+    thoughtDurationMs: number
 }
 
 export interface Scenario {
@@ -18,7 +22,6 @@ export interface Scenario {
     steps: ScenarioStep[]
 }
 
-/** Normalize a prompt for matching: lowercase, collapse whitespace, strip trailing punctuation. */
 export function normalizePrompt(input: string): string {
     return input
         .toLowerCase()

@@ -18,19 +18,19 @@ export interface ThinkingState {
 }
 
 interface ThreadsContextValue {
-    threads: Thread[]
+    addAgent: (agent: Agent) => void
+    addMessage: (threadId: string, message: Message) => void
     addThread: (thread: Thread) => void
     agents: Agent[]
-    addAgent: (agent: Agent) => void
+    messages: Record<string, Message[]>
+    sendUserMessage: (threadId: string, content: string) => void
     setAgentActive: (agentId: string, active: boolean) => void
+    thinking: Record<string, ThinkingState | null>
+    threads: Thread[]
     updateAgentConfiguration: (
         agentId: string,
         updates: Partial<Pick<Agent['configuration'], 'scope' | 'run_as'>>
     ) => void
-    messages: Record<string, Message[]>
-    addMessage: (threadId: string, message: Message) => void
-    thinking: Record<string, ThinkingState | null>
-    sendUserMessage: (threadId: string, content: string) => void
 }
 
 const ThreadsContext = createContext<ThreadsContextValue | null>(null)
@@ -144,11 +144,12 @@ function ThreadsProvider({ children }: { children: React.ReactNode }) {
         handles.push(
             setTimeout(() => {
                 addMessage(threadId, {
-                    id: crypto.randomUUID(),
-                    role: 'agent',
+                    actions: step.reply.actions,
                     content: step.reply.content,
                     created_at: new Date().toISOString(),
-                    actions: step.reply.actions,
+                    id: crypto.randomUUID(),
+                    role: 'agent',
+                    suggestions: step.reply.suggestions,
                     thought_duration_ms: total,
                 })
                 setThinking((prev) => ({ ...prev, [threadId]: null }))
@@ -187,16 +188,16 @@ function ThreadsProvider({ children }: { children: React.ReactNode }) {
     return (
         <ThreadsContext
             value={{
-                threads,
+                addAgent,
+                addMessage,
                 addThread,
                 agents,
-                addAgent,
-                setAgentActive,
-                updateAgentConfiguration,
                 messages,
-                addMessage,
-                thinking,
                 sendUserMessage,
+                setAgentActive,
+                thinking,
+                threads,
+                updateAgentConfiguration,
             }}
         >
             {children}

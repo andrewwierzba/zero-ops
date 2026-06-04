@@ -2,8 +2,7 @@
 
 import { use, useState } from 'react'
 
-import { ReplyIcon } from '@databricks/design-system'
-import { ChevronsLeftIcon, GitForkIcon, PlusIcon, SettingsIcon, ShareIcon, XIcon } from 'lucide-react'
+import { BugIcon, ChevronDoubleLeftIcon, CloseIcon, CopyIcon, ForkIcon, GearIcon, PlusIcon, ReplyIcon, ShareIcon, SyncIcon, ThumbsDownIcon, ThumbsUpIcon } from '@databricks/design-system'
 
 import { useRouter } from 'next/navigation'
 import { usePanelRef } from 'react-resizable-panels'
@@ -22,8 +21,18 @@ import { useThreads } from '@/components/app/threads-context'
 import { Button } from '@/components/ui/button'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
+import { MessageAction } from '@/data/messages'
 import { Thread } from '@/data/threads'
+
+const ACTION_ICONS: Record<NonNullable<MessageAction['icon']>, React.ComponentType<React.ComponentProps<typeof BugIcon>>> = {
+    thumbs_up: ThumbsUpIcon,
+    thumbs_down: ThumbsDownIcon,
+    regenerate: SyncIcon,
+    copy: CopyIcon,
+    copy_debug: BugIcon,
+}
 
 type ThreadStatus = NonNullable<Thread['status']>
 type ThreadSeverity = NonNullable<Thread['severity']>
@@ -164,9 +173,9 @@ function Page({ params }: PageProps) {
     const thread = threads.find((t) => t.id === threadId)
     const threadMessages = messages[threadId] ?? []
     const threadThinking = thinking[threadId] ?? null
-    const latestActionMessageId = [...threadMessages]
+    const latestAgentMessageId = [...threadMessages]
         .reverse()
-        .find((message) => message.role === 'agent' && message.actions && message.actions.length > 0)?.id
+        .find((message) => message.role === 'agent')?.id
 
     const [showAutomationPanel, setShowAutomationPanel] = useState(false)
     const [showIncidentPanel, setShowIncidentPanel] = useState(false)
@@ -223,7 +232,7 @@ function Page({ params }: PageProps) {
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <ChevronsLeftIcon size={4} />
+                                    <ChevronDoubleLeftIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
 
                                 {/* Thread label */}
@@ -250,16 +259,16 @@ function Page({ params }: PageProps) {
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <PlusIcon size={4} />
+                                    <PlusIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
                                 <Button size="icon" variant="ghost">
-                                    <SettingsIcon size={4} />
+                                    <GearIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
                                 <Button size="icon" variant="ghost">
-                                    <ShareIcon size={4} />
+                                    <ShareIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
                                 <Button size="icon" variant="ghost">
-                                    <GitForkIcon size={4} />
+                                    <ForkIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
 
                                 {/* Optional */}
@@ -285,6 +294,22 @@ function Page({ params }: PageProps) {
                                         </div>
                                     ) : (
                                         <div className="flex flex-col gap-6 max-w-3xl mx-auto">
+                                            <svg aria-hidden className="absolute" height="0" width="0">
+                                                <defs>
+                                                    <linearGradient
+                                                        gradientUnits="userSpaceOnUse"
+                                                        id="reply-icon-gradient"
+                                                        x1="-1.16831"
+                                                        x2="12.4619"
+                                                        y1="1.18452"
+                                                        y2="18.6312"
+                                                    >
+                                                        <stop offset="0.235" stopColor="#4299E0" />
+                                                        <stop offset="0.47" stopColor="#CA42E0" />
+                                                        <stop offset="0.76" stopColor="#FF5F46" />
+                                                    </linearGradient>
+                                                </defs>
+                                            </svg>
                                             {threadMessages.map((message) => (
                                                 <div
                                                     className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -311,28 +336,12 @@ function Page({ params }: PageProps) {
                                                             <div className="flex flex-col gap-3">
                                                                 {renderContent(message.content)}
                                                             </div>
-                                                            {message.id === latestActionMessageId && message.actions && message.actions.length > 0 && (
+                                                            {message.id === latestAgentMessageId && message.suggestions && message.suggestions.length > 0 && (
                                                                 <div className="flex flex-wrap gap-2 pt-1">
-                                                                    <svg aria-hidden className="absolute" height="0" width="0">
-                                                                        <defs>
-                                                                            <linearGradient
-                                                                                gradientUnits="userSpaceOnUse"
-                                                                                id="reply-icon-gradient"
-                                                                                x1="-1.16831"
-                                                                                x2="12.4619"
-                                                                                y1="1.18452"
-                                                                                y2="18.6312"
-                                                                            >
-                                                                                <stop offset="0.235" stopColor="#4299E0" />
-                                                                                <stop offset="0.47" stopColor="#CA42E0" />
-                                                                                <stop offset="0.76" stopColor="#FF5F46" />
-                                                                            </linearGradient>
-                                                                        </defs>
-                                                                    </svg>
-                                                                    {message.actions.map((action) => (
+                                                                    {message.suggestions.map((suggestion) => (
                                                                         <Button
-                                                                            className="items-center rounded-[12px] rounded-tl-none gap-1.5 w-fit"
-                                                                            key={action.label}
+                                                                            className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none gap-1.5 w-fit"
+                                                                            key={suggestion.label}
                                                                             variant="secondary"
                                                                         >
                                                                             <ReplyIcon
@@ -341,11 +350,45 @@ function Page({ params }: PageProps) {
                                                                                 onPointerLeaveCapture={() => {}}
                                                                                 size={3.5}
                                                                             />
-                                                                            <span>{action.label}</span>
+                                                                            <span>{suggestion.label}</span>
                                                                         </Button>
                                                                     ))}
                                                                 </div>
                                                             )}
+                                                            {(() => {
+                                                                const visibleActions = (message.actions ?? []).filter(
+                                                                    (action) => message.id === latestAgentMessageId || !action.transient
+                                                                )
+                                                                if (visibleActions.length === 0) return null
+                                                                return (
+                                                                    <div className="items-center flex gap-0">
+                                                                        {visibleActions.map((action) => {
+                                                                            const Icon = action.icon ? ACTION_ICONS[action.icon] : null
+                                                                            if (!Icon) return null
+                                                                            return (
+                                                                                <Tooltip key={action.label}>
+                                                                                    <TooltipTrigger
+                                                                                        render={
+                                                                                            <Button
+                                                                                                aria-label={action.label}
+                                                                                                className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
+                                                                                                size="icon-sm"
+                                                                                                variant="ghost"
+                                                                                            >
+                                                                                                <Icon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} />
+                                                                                                <span className="sr-only">{action.label}</span>
+                                                                                            </Button>
+                                                                                        }
+                                                                                    />
+                                                                                    <TooltipContent>
+                                                                                        <span>{action.label}</span>
+                                                                                    </TooltipContent>
+                                                                                </Tooltip>
+                                                                            )
+                                                                        })}
+                                                                    </div>
+                                                                )
+                                                            })()}
                                                         </div>
                                                     )}
                                                 </div>
@@ -422,7 +465,7 @@ function Page({ params }: PageProps) {
                                             size="icon"
                                             variant="ghost"
                                             >
-                                            <XIcon size={4}/>
+                                            <CloseIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4}/>
                                         </Button>
                                     </div>
                                     {showIncidentPanel && thread && (
