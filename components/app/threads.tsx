@@ -1,6 +1,7 @@
 'use client'
 
-import { FilterIcon, InboxIcon, SearchIcon, SettingsIcon, SquarePenIcon } from 'lucide-react'
+import { SearchIcon } from '@databricks/design-system'
+import { InboxIcon, SquarePenIcon } from 'lucide-react'
 
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -13,7 +14,6 @@ import { useThreads } from '@/components/app/threads-context'
 
 import { Button } from '@/components/ui/button'
 
-type FilterType = 'all' | 'incident'
 type SortBy = 'updated_at' | 'created_at'
 type ThreadStatus = NonNullable<Thread['status']>
 
@@ -33,7 +33,6 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
     const pathname = usePathname()
     const router = useRouter()
     const { threads, addThread } = useThreads()
-    const [filterType, setFilterType] = useState<FilterType>('all')
     const [sortBy, setSortBy] = useState<SortBy>('updated_at')
 
     function isActive(href: string) {
@@ -53,7 +52,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
     return (
         <div className="flex flex-col flex-1 overflow-hidden">
             <div className={`items-center border-b flex gap-2 ${panelOpen ? 'justify-between pl-3 pr-2' : 'justify-center px-2'} py-2`}>
-                {panelOpen && <span className="text-sm font-medium">Genie Code</span>}
+                {panelOpen && <span className="text-[13px] font-semibold">Genie Code</span>}
                 <Button
                     className="group"
                     onClick={onToggle}
@@ -68,7 +67,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                 <div className="flex flex-col gap-3 p-2">
                     <div className="flex flex-col gap-1">
                         <Button
-                            className="gap-2 justify-start"
+                            className="text-[13px] font-normal gap-2 justify-start"
                             onClick={handleNewThread}
                             variant="ghost"
                         >
@@ -77,10 +76,14 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                         </Button>
 
                         <Button
-                            className="gap-2 justify-start"
+                            className="text-[13px] font-normal gap-2 justify-start"
                             variant="ghost"
                         >
-                            <SearchIcon className="size-4" />
+                            <SearchIcon
+                                className="size-4"
+                                onPointerEnterCapture={() => {}}
+                                onPointerLeaveCapture={() => {}}
+                            />
                             Search
                         </Button>
 
@@ -96,7 +99,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
 
                     <div className="flex flex-col">
                         <Button
-                            className={`gap-2 justify-start ${isActive('/c/inbox') ? 'bg-muted' : ''}`}
+                            className={`text-[13px] font-normal gap-2 justify-start ${isActive('/c/inbox') ? 'bg-muted' : ''}`}
                             onClick={() => router.push('/c/inbox')}
                             variant="ghost"
                         >
@@ -119,7 +122,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                                 <span className="shrink-0 size-2">
                                     {thread.status && <span className={`rounded-full ${STATUS_DOT_CLASS[thread.status]} block size-2`} />}
                                 </span>
-                                <span className="truncate">{thread.label}</span>
+                                <span className="text-[13px] font-normal truncate">{thread.label}</span>
                                 <span aria-describedby="Last updated" className="text-muted-foreground text-xs mt-0.5">
                                     2m
                                 </span>
