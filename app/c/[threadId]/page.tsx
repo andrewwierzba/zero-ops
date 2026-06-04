@@ -226,8 +226,9 @@ function Page({ params }: PageProps) {
                     <ResizablePanel className="flex flex-col" minSize="200px">
                         {/* Thread header */}
                         <div className="border-b flex gap-2 justify-between p-2">
-                            <div className="items-center flex gap-1 min-w-0">
+                            <div className="items-center flex gap-2 min-w-0">
                                 <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     onClick={() => router.push('/c')}
                                     size="icon"
                                     variant="ghost"
@@ -236,7 +237,7 @@ function Page({ params }: PageProps) {
                                 </Button>
 
                                 {/* Thread label */}
-                                <span className="text-sm font-medium min-w-0 truncate">{thread?.label ?? threadId}</span>
+                                <span className="text-[13px] font-semibold min-w-0 truncate">{thread?.label ?? threadId}</span>
                                 {thread?.type === 'incident' && (
                                     <>
                                         <span className="bg-muted rounded-sm text-muted-foreground inline-flex text-xs px-1.5 py-0.5">
@@ -255,24 +256,38 @@ function Page({ params }: PageProps) {
                             </div>
                             <div className="items-center flex gap-1">
                                 <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     disabled
                                     size="icon"
                                     variant="ghost"
                                 >
                                     <PlusIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
-                                <Button size="icon" variant="ghost">
+                                <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
+                                    size="icon"
+                                    variant="ghost"
+                                >
                                     <GearIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
-                                <Button size="icon" variant="ghost">
+                                <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
+                                    size="icon"
+                                    variant="ghost"
+                                >
                                     <ShareIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
-                                <Button size="icon" variant="ghost">
+                                <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
+                                    size="icon"
+                                    variant="ghost"
+                                >
                                     <ForkIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
 
                                 {/* Optional */}
                                 <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     onClick={handleSidePanelOpen}
                                     size="icon"
                                     variant="ghost"
@@ -283,13 +298,13 @@ function Page({ params }: PageProps) {
                         </div>
                         <div className="flex-1 overflow-y-auto min-h-0">
                             <div className="flex flex-col min-h-full">
-                                <div className="flex-1 p-6">
+                                <div className="flex-1 text-[13px] p-6">
                                     {threadMessages.length === 0 && !threadThinking ? (
                                         <div className="flex flex-col items-center justify-center gap-4 h-full">
                                             <GenieCodeIcon size={64} />
                                             <div className="flex flex-col gap-2 text-center">
                                                 <span className="text-2xl font-semibold">Genie Code</span>
-                                                <span className="text-muted-foreground text-sm">Send a message to start the conversation.</span>
+                                                <span className="text-muted-foreground">Send a message to start the conversation.</span>
                                             </div>
                                         </div>
                                     ) : (
@@ -316,12 +331,12 @@ function Page({ params }: PageProps) {
                                                     key={message.id}
                                                 >
                                                     {message.role === 'user' ? (
-                                                        <div className="rounded-2xl px-4 py-2.5 text-sm bg-blue-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+                                                        <div className="bg-[rgb(215,237,254)] dark:bg-[rgb(4,53,93)] rounded-2xl rounded-br-none text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] px-4 py-2.5">
                                                             {/* Removed: max-w-prose */}
                                                             {message.content}
                                                         </div>
                                                     ) : (
-                                                        <div className="flex flex-col gap-2 text-sm w-full">
+                                                        <div className="flex flex-col gap-2 w-full">
                                                             {/* Removed: max-w-prose */}
                                                             {message.thought_duration_ms != null && (
                                                                 <div className="text-muted-foreground text-xs">
@@ -395,7 +410,7 @@ function Page({ params }: PageProps) {
                                             ))}
                                             {threadThinking && (
                                                 <div className="flex justify-start" aria-live="polite">
-                                                    <div className="flex flex-col gap-2 text-sm max-w-prose w-full">
+                                                    <div className="flex flex-col gap-2 max-w-prose w-full">
                                                         {threadThinking.steps && threadThinking.steps.length > 0 ? (
                                                             <div className="flex flex-col">
                                                                 {threadThinking.steps.map((step, index, steps) => (
@@ -456,7 +471,7 @@ function Page({ params }: PageProps) {
                             <ResizablePanel defaultSize="400px" minSize="200px">
                                 <div className="flex flex-col h-full">
                                     <div className="items-center border-b flex gap-2 justify-between p-2">
-                                        <span className="text-sm font-medium capitalize">{showIncidentPanel ? 'Incident details' : thread?.type}</span>
+                                        <span className="font-medium capitalize">{showIncidentPanel ? 'Incident details' : thread?.type}</span>
                                         <Button
                                             onClick={() => {
                                                 setShowAutomationPanel(false)
@@ -469,7 +484,7 @@ function Page({ params }: PageProps) {
                                         </Button>
                                     </div>
                                     {showIncidentPanel && thread && (
-                                        <div className="flex flex-col gap-4 p-4 text-sm">
+                                        <div className="flex flex-col gap-4 p-4">
                                             <div className="flex flex-col gap-1">
                                                 <span className="text-muted-foreground text-xs">Insight</span>
                                                 <span className="font-medium">{thread.label}</span>
@@ -513,7 +528,7 @@ function Page({ params }: PageProps) {
                                             </div>
 
                                             <div className="items-center border-t flex justify-between py-3">
-                                                <span className="text-sm font-medium">Root cause summary</span>
+                                                <span className="font-medium">Root cause summary</span>
                                                 <Button onClick={() => setShowRootCauseSummary((open) => !open)} size="sm" variant="ghost">
                                                     {showRootCauseSummary ? 'Collapse' : 'Expand'}
                                                 </Button>
@@ -525,7 +540,7 @@ function Page({ params }: PageProps) {
                                             )}
 
                                             <div className="items-center border-t flex justify-between py-3">
-                                                <span className="text-sm font-medium">Activity</span>
+                                                <span className="font-medium">Activity</span>
                                                 <Button onClick={() => setShowProgress((open) => !open)} size="sm" variant="ghost">
                                                     {showProgress ? 'Collapse' : 'Expand'}
                                                 </Button>

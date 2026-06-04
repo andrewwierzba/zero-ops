@@ -38,10 +38,10 @@ function Page() {
                         panelRef={threadsPanelRef}
                         onResize={(size) => setThreadsOpen(size.inPixels > 48)}
                     >
-                        <Threads panelOpen={threadsOpen} onToggle={handleThreadsToggle} />
+                        <Threads onToggle={handleThreadsToggle} panelOpen={threadsOpen} />
                     </ResizablePanel>
                     <ResizableHandle />
-                    <ResizablePanel className="flex flex-col" minSize="200px">
+                    <ResizablePanel className="flex flex-col text-[13px]" minSize="200px">
                         <div className="border-b flex gap-2 justify-between p-2 shrink-0">
                             <div className="items-center flex gap-1">
                                 <Button
@@ -51,7 +51,7 @@ function Page() {
                                 >
                                     <ChevronsLeftIcon className="size-4" />
                                 </Button>
-                                <span className="text-sm font-medium">New thread</span>
+                                <span className="font-semibold">New thread</span>
                             </div>
                             <div className="items-center flex gap-1">
                                 <Button
@@ -75,9 +75,9 @@ function Page() {
                         <div className="flex-1 overflow-y-auto min-h-0">
                             <div className="flex flex-col min-h-full">
                                 <div className="flex-1 flex items-center justify-center p-6">
-                                    <span className="text-muted-foreground text-sm">New thread</span>
+                                    <span className="text-muted-foreground">New thread</span>
                                 </div>
-                                <div className="sticky bottom-0 bg-background">
+                                <div className="bg-background bottom-0 sticky">
                                     <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
                                     <div className="max-w-3xl mx-auto px-6 pb-6">
                                         <Chatbox />
