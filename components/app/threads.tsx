@@ -1,6 +1,7 @@
 'use client'
 
 import { FilterIcon, InboxIcon, SearchIcon, SettingsIcon, SquarePenIcon } from 'lucide-react'
+
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -11,25 +12,16 @@ import { Thread } from '@/data/threads'
 import { useThreads } from '@/components/app/threads-context'
 
 import { Button } from '@/components/ui/button'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuLabel,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 
 type FilterType = 'all' | 'incident'
 type SortBy = 'updated_at' | 'created_at'
 type ThreadStatus = NonNullable<Thread['status']>
 
 const STATUS_DOT_CLASS: Record<ThreadStatus, string> = {
-    investigating: 'bg-red-500',
-    'pending review': 'bg-yellow-400',
-    resolved: 'bg-green-500',
+    investigating: 'bg-[rgb(200,45,76)]',
+    not_an_issue: 'bg-[rgb(111,111,111)]',
+    open: 'bg-[rgb(190,80,30)]',
+    resolved: 'bg-[rgb(39,124,67)]',
 }
 
 interface ThreadsProps {
@@ -61,7 +53,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
     return (
         <div className="flex flex-col flex-1 overflow-hidden">
             <div className={`items-center border-b flex gap-2 ${panelOpen ? 'justify-between pl-3 pr-2' : 'justify-center px-2'} py-2`}>
-                {panelOpen && <span className="text-sm font-medium">Threads</span>}
+                {panelOpen && <span className="text-sm font-medium">Genie Code</span>}
                 <Button
                     className="group"
                     onClick={onToggle}
@@ -116,36 +108,6 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                     <div className="flex flex-col gap-1">
                         <div className="items-center flex gap-2 justify-between pl-3 pr-1">
                             <span className="text-muted-foreground text-xs">Recents</span>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger
-                                    render={
-                                        <Button
-                                            className={filterType !== 'all' ? 'text-foreground' : 'text-muted-foreground'}
-                                            size="icon-sm"
-                                            variant="ghost"
-                                        >
-                                            <FilterIcon className="size-4" />
-                                        </Button>
-                                    }
-                                />
-                                <DropdownMenuContent align="end" side="bottom">
-                                    <DropdownMenuGroup>
-                                        <DropdownMenuLabel>Filter</DropdownMenuLabel>
-                                        <DropdownMenuRadioGroup value={filterType} onValueChange={(v) => setFilterType(v as FilterType)}>
-                                            <DropdownMenuRadioItem value="all">All</DropdownMenuRadioItem>
-                                            <DropdownMenuRadioItem value="incident">Incidents</DropdownMenuRadioItem>
-                                        </DropdownMenuRadioGroup>
-                                    </DropdownMenuGroup>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuGroup>
-                                        <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                                        <DropdownMenuRadioGroup value={sortBy} onValueChange={(v) => setSortBy(v as SortBy)}>
-                                            <DropdownMenuRadioItem value="updated_at">Updated</DropdownMenuRadioItem>
-                                            <DropdownMenuRadioItem value="created_at">Created</DropdownMenuRadioItem>
-                                        </DropdownMenuRadioGroup>
-                                    </DropdownMenuGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
                         </div>
                         {visibleThreads.map((thread) => (
                             <Button

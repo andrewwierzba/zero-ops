@@ -23,9 +23,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 type ThreadStatus = NonNullable<Thread['status']>
 
 const StatusMetadata: Record<ThreadStatus, { iconClass: string; badgeClass: string; label: string; }> = {
-    investigating: { badgeClass: 'bg-red-500/5', iconClass: 'bg-red-500', label: 'Investigating' },
-    'pending review': { badgeClass: 'bg-yellow-400/5', iconClass: 'bg-yellow-400', label: 'Pending review' },
-    resolved: { badgeClass: 'bg-green-500/5', iconClass: 'bg-green-500', label: 'Resolved' },
+    investigating: { badgeClass: 'bg-[rgb(200,45,76)]/5', iconClass: 'bg-[rgb(200,45,76)]', label: 'Investigating' },
+    not_an_issue: { badgeClass: 'bg-[rgb(111,111,111)]/5', iconClass: 'bg-[rgb(111,111,111)]', label: 'Not an issue' },
+    open: { badgeClass: 'bg-[rgb(190,80,30)]/5', iconClass: 'bg-[rgb(190,80,30)]', label: 'Open' },
+    resolved: { badgeClass: 'bg-[rgb(39,124,67)]/5', iconClass: 'bg-[rgb(39,124,67)]', label: 'Resolved' },
 }
 
 const SeverityLabel: Record<NonNullable<Thread['severity']>, string> = {
@@ -155,7 +156,7 @@ type FilterState = {
 }
 
 const SEVERITY_OPTIONS: NonNullable<Thread['severity']>[] = ['minor', 'moderate', 'critical']
-const STATUS_OPTIONS: NonNullable<Thread['status']>[] = ['investigating', 'pending review', 'resolved']
+const STATUS_OPTIONS: NonNullable<Thread['status']>[] = ['investigating', 'not_an_issue', 'open', 'resolved']
 
 function Page() {
     const router = useRouter()

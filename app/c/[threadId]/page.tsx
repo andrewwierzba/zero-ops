@@ -30,9 +30,10 @@ type ThreadSeverity = NonNullable<Thread['severity']>
 type ThreadProgressStatus = NonNullable<NonNullable<Thread['progress_updates']>[number]['status']>
 
 const StatusMetadata: Record<ThreadStatus, { dotClass: string; label: string; }> = {
-    investigating: { dotClass: 'bg-red-500', label: 'Investigating' },
-    'pending review': { dotClass: 'bg-yellow-400', label: 'Pending review' },
-    resolved: { dotClass: 'bg-green-500', label: 'Resolved' },
+    investigating: { dotClass: 'bg-[rgb(200,45,76)]', label: 'Investigating' },
+    not_an_issue: { dotClass: 'bg-[rgb(111,111,111)]', label: 'Not an issue' },
+    open: { dotClass: 'bg-[rgb(190,80,30)]', label: 'Open' },
+    resolved: { dotClass: 'bg-[rgb(39,124,67)]', label: 'Resolved' },
 }
 
 const SeverityLabel: Record<ThreadSeverity, string> = {

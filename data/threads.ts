@@ -3,7 +3,7 @@ export interface Thread {
     archived_at?: string
     label: string
     severity?: 'minor' | 'moderate' | 'critical'
-    status?: 'investigating' | 'pending review' | 'resolved'
+    status?: 'investigating' | 'not_an_issue' | 'open' | 'resolved'
     type?: 'automation' | 'incident'
     impact_assets?: string[]
     progress_updates?: { description: string; detail?: string; status: 'completed' | 'current' | 'pending'; timestamp: string }[]
@@ -17,11 +17,29 @@ export interface Thread {
 
 export const defaultThreads: Thread[] = [
     {
+        id: '11111111-0000-0000-0000-000000000010',
+        label: '3 claims processing jobs failing due to schema drift',
+        created_at: '2026-04-20T10:00:00+00:00',
+        severity: 'critical',
+        status: 'investigating',
+        type: 'incident',
+        impact_assets: ['etl_claims_daily', 'etl_claims_enrichment', 'report_claims_summary'],
+        progress_updates: [
+            { description: 'Schema drift detected', detail: 'Upstream `claims.policy_id` column type changed from INT to STRING.', status: 'completed', timestamp: '2026-04-20T10:00:00+00:00' },
+            { description: 'Failed joins isolated', detail: '3 downstream jobs failing at the join with `policies` on `policy_id`.', status: 'completed', timestamp: '2026-04-20T10:02:00+00:00' },
+            { description: 'Fix prepared', detail: 'Cast-based fix drafted; ready for review.', status: 'current', timestamp: '2026-04-20T10:05:00+00:00' },
+            { description: 'PR opened', status: 'pending', timestamp: '2026-04-20T10:06:00+00:00' },
+        ],
+        reported_by: 'Autopilot: Debug Databricks Job Failures',
+        root_cause_summary: 'Upstream `claims.policy_id` was changed from INT to STRING; downstream joins fail with type mismatch.',
+        updated_at: '2026-04-20T10:05:00+00:00',
+    },
+    {
         id: '11111111-0000-0000-0000-000000000009',
         label: 'Sales dashboard data arriving late',
         created_at: '2026-04-20T09:30:00+00:00',
         severity: 'critical',
-        status: 'pending review',
+        status: 'open',
         type: 'incident',
         impact_assets: ['sales_daily_dashboard', 'etl_sales_daily'],
         progress_updates: [
@@ -101,7 +119,7 @@ export const defaultThreads: Thread[] = [
         label: 'etl_marketing_events freshness SLA at risk',
         created_at: '2026-04-20T08:15:00+00:00',
         severity: 'moderate',
-        status: 'pending review',
+        status: 'open',
         type: 'incident',
         impact_assets: ['etl_marketing_events'],
         progress_updates: [
@@ -136,7 +154,7 @@ export const defaultThreads: Thread[] = [
         label: 'DBR 14 -> 17 update available for 4 jobs',
         created_at: '2026-04-20T06:05:00+00:00',
         severity: 'minor',
-        status: 'pending review',
+        status: 'open',
         type: 'incident',
         impact_assets: ['etl_sales_daily', 'etl_marketing_events', 'report_customer_360', 'ml_churn_scoring'],
         progress_updates: [
@@ -153,7 +171,7 @@ export const defaultThreads: Thread[] = [
         label: 'Churn scoring: unused columns can be removed',
         created_at: '2026-04-20T06:00:00+00:00',
         severity: 'minor',
-        status: 'pending review',
+        status: 'open',
         type: 'incident',
         impact_assets: ['ml_churn_scoring', 'churn_scoring'],
         progress_updates: [
