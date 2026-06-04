@@ -298,9 +298,15 @@ function Page({ params }: PageProps) {
                         </div>
                         <div className="flex-1 overflow-y-auto min-h-0">
                             <div className="flex flex-col min-h-full">
-                                <div className="flex-1 text-[13px] p-6">
+                                <div
+                                    className={`flex-1 text-[13px] p-6 ${
+                                        threadMessages.length === 0 && !threadThinking
+                                            ? 'flex items-center justify-center'
+                                            : ''
+                                    }`}
+                                >
                                     {threadMessages.length === 0 && !threadThinking ? (
-                                        <div className="flex flex-col items-center justify-center gap-4 h-full">
+                                        <div className="flex flex-col items-center gap-4">
                                             <GenieCodeIcon size={64} />
                                             <div className="flex flex-col gap-2 text-center">
                                                 <span className="text-2xl font-semibold">Genie Code</span>
@@ -456,10 +462,14 @@ function Page({ params }: PageProps) {
                                         </div>
                                     )}
                                 </div>
-                                <div className="sticky bottom-0 bg-background">
-                                    <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+                                <div className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] bottom-0 sticky">
+                                    <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-t from-[rgb(255,255,255)] dark:from-[rgb(17,23,28)] to-transparent pointer-events-none" />
                                     <div className="max-w-3xl mx-auto px-6 pb-6">
-                                        <Chatbox onSubmit={handleSubmit} showModelSelection={false} />
+                                        <Chatbox
+                                            className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)]"
+                                            onSubmit={handleSubmit}
+                                            showModelSelection={false}
+                                        />
                                     </div>
                                 </div>
                             </div>

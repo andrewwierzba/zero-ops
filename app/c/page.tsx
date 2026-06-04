@@ -77,10 +77,10 @@ function Page() {
                                 <div className="flex-1 flex items-center justify-center p-6">
                                     <span className="text-muted-foreground">New thread</span>
                                 </div>
-                                <div className="bg-background bottom-0 sticky">
-                                    <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+                                <div className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] bottom-0 sticky">
+                                    <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-t from-[rgb(255,255,255)] dark:from-[rgb(17,23,28)] to-transparent pointer-events-none" />
                                     <div className="max-w-3xl mx-auto px-6 pb-6">
-                                        <Chatbox />
+                                        <Chatbox className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)]" />
                                     </div>
                                 </div>
                             </div>
