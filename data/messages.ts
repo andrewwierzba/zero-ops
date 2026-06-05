@@ -1,5 +1,6 @@
 export interface Message {
     actions?: MessageAction[]
+    code_changes?: CodeChange
     content: string
     created_at: string
     embed?: 'graph'
@@ -13,6 +14,22 @@ export interface MessageAction {
     icon?: 'thumbs_up' | 'thumbs_down' | 'regenerate' | 'copy' | 'copy_debug'
     label: string
     transient?: boolean
+}
+
+export interface CodeChangeFile {
+    code: string
+    filename: string
+    language?: string
+}
+
+export interface CodeChangeAction {
+    label: string
+}
+
+export interface CodeChange {
+    actions?: CodeChangeAction[]
+    files: CodeChangeFile[]
+    style: 'single' | 'group'
 }
 
 export interface ThreadMessages {
@@ -34,6 +51,27 @@ export const defaultMessages: ThreadMessages[] = [
         messages: [
             {
                 actions: defaultAgentActions,
+                code_changes: {
+                    actions: [
+                        { label: 'Review' },
+                        { label: 'Create PR' },
+                    ],
+                    files: [
+                        {
+                            code: `- SELECT c.claim_id, p.policy_holder, c.amount
+- FROM claims c
+- JOIN policies p
+-   ON c.policy_id = p.policy_id
++ SELECT c.claim_id, p.policy_holder, c.amount
++ FROM claims c
++ JOIN policies p
++   ON CAST(c.policy_id AS STRING) = CAST(p.policy_id AS STRING)`,
+                            filename: 'claims_processing.py',
+                            language: 'diff',
+                        },
+                    ],
+                    style: 'group',
+                },
                 content: `3 claims processing jobs are failing this morning due to schema drift on the upstream \`claims.policy_id\` column — it was changed from INT to STRING overnight. All three jobs fail at the join step against \`policies\`.
 
 **What's impacted:**
@@ -42,18 +80,7 @@ export const defaultMessages: ThreadMessages[] = [
 - \`report_claims_summary\` — downstream report has no fresh data since 03:14 UTC
 
 **Proposed fix:**
-Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer than reverting the upstream schema change.
-
-\`\`\`diff
-- SELECT c.claim_id, p.policy_holder, c.amount
-- FROM claims c
-- JOIN policies p
--   ON c.policy_id = p.policy_id
-+ SELECT c.claim_id, p.policy_holder, c.amount
-+ FROM claims c
-+ JOIN policies p
-+   ON CAST(c.policy_id AS STRING) = CAST(p.policy_id AS STRING)
-\`\`\``,
+Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer than reverting the upstream schema change.`,
                 created_at: '2026-04-20T10:05:00+00:00',
                 embed: 'graph',
                 id: 'msg-0010-01',
@@ -102,14 +129,14 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
         threadId: '11111111-0000-0000-0000-000000000002',
         messages: [
             {
-                content: 'What can Autopilot in Genie Code do?',
+                content: 'What can Genie ZeroOps do?',
                 created_at: '2026-04-14T14:00:00+00:00',
                 id: 'msg-0002-01',
                 role: 'user',
             },
             {
                 actions: defaultAgentActions,
-                content: 'Autopilot is the agentic layer of Genie Code. It monitors your jobs in the background and takes action when something needs attention — debugging failures, surfacing insights, and flagging issues before they escalate. You can configure it to watch specific jobs, tags, or ownership groups and define how it should respond.',
+                content: 'Genie ZeroOps is the agentic layer that monitors your jobs in the background and takes action when something needs attention — debugging failures, surfacing insights, and flagging issues before they escalate. You can configure it to watch specific jobs, tags, or ownership groups and define how it should respond.',
                 created_at: '2026-04-14T14:00:05+00:00',
                 id: 'msg-0002-02',
                 role: 'agent',
@@ -123,7 +150,7 @@ Cast \`policy_id\` to STRING in the join predicate across all three jobs. Safer 
             },
             {
                 actions: defaultAgentActions,
-                content: "No. Autopilot runs continuously in the background. It'll open a thread here when it detects something worth your attention, so you can review and respond on your own schedule.",
+                content: "No. Genie ZeroOps runs continuously in the background. It'll open a thread here when it detects something worth your attention, so you can review and respond on your own schedule.",
                 created_at: '2026-04-14T14:05:00+00:00',
                 id: 'msg-0002-04',
                 role: 'agent',

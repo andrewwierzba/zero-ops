@@ -14,6 +14,7 @@ import { PanelRightOpenIcon } from '@/app/assets/icons/panel-right-open'
 import { ApplicationContent, ApplicationShell } from '@/components/app/application-shell'
 import { Chatbox } from '@/components/app/chatbox'
 import { CodeBlock } from '@/components/app/code-block'
+import { CodeChange } from '@/components/app/code-change'
 import { Graph } from '@/components/app/graph'
 import Threads from '@/components/app/threads'
 import { useThreads } from '@/components/app/threads-context'
@@ -188,12 +189,11 @@ function Page({ params }: PageProps) {
     }
 
     function handleThreadsToggle() {
-        if (threadsOpen) {
-            threadsPanelRef.current?.collapse()
-        } else {
+        if (threadsPanelRef.current?.isCollapsed()) {
             threadsPanelRef.current?.expand()
+        } else {
+            threadsPanelRef.current?.collapse()
         }
-        setThreadsOpen((o) => !o)
     }
 
     function handleSidePanelOpen() {
@@ -215,8 +215,11 @@ function Page({ params }: PageProps) {
                         className="flex"
                         collapsedSize="48px"
                         collapsible
-                        defaultSize="200px"
+                        defaultSize="296px"
                         minSize="200px"
+                        onResize={() => {
+                            setThreadsOpen(!threadsPanelRef.current?.isCollapsed())
+                        }}
                         panelRef={threadsPanelRef}
                     >
                         <Threads onToggle={handleThreadsToggle} panelOpen={threadsOpen} />
@@ -295,7 +298,7 @@ function Page({ params }: PageProps) {
                                 </Button>
                             </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto min-h-0">
+                        <div className="flex-1 min-h-0 overflow-y-auto ">
                             <div className="flex flex-col min-h-full">
                                 <div
                                     className={`flex-1 text-[13px] p-6 ${
@@ -355,6 +358,7 @@ function Page({ params }: PageProps) {
                                                             )}
                                                             <div className="flex flex-col gap-3">
                                                                 {renderContent(message.content)}
+                                                                {message.code_changes && <CodeChange {...message.code_changes} />}
                                                             </div>
                                                             {message.id === latestAgentMessageId && message.suggestions && message.suggestions.length > 0 && (
                                                                 <div className="flex flex-wrap gap-2 pt-1">
@@ -534,7 +538,7 @@ function Page({ params }: PageProps) {
                                             </div>
                                             <div className="flex flex-col gap-1">
                                                 <span className="text-muted-foreground text-xs">Reported by</span>
-                                                <span>{thread.reported_by ?? 'Autopilot agent'}</span>
+                                                <span>{thread.reported_by ?? 'Genie ZeroOps agent'}</span>
                                             </div>
 
                                             <div className="items-center border-t flex justify-between py-3">
