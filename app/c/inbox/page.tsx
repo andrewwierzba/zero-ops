@@ -1,7 +1,10 @@
 'use client'
 
 import { format, isValid } from 'date-fns'
+
+import { ReplyIcon } from '@databricks/design-system'
 import { ArchiveIcon, ArrowUpIcon, EllipsisVerticalIcon, FunnelIcon, MicIcon, SlidersHorizontal } from 'lucide-react'
+
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -225,7 +228,7 @@ function Page() {
 
     const filterDropdown = (
         <DropdownMenu>
-            <DropdownMenuTrigger className="flex gap-1.5 rounded-md px-1.5 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
+            <DropdownMenuTrigger className="items-center flex gap-1.5 rounded-md px-1.5 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
                 <FunnelIcon className="size-3.5" />
                 Filter
                 {activeFilterCount > 0 && (
@@ -283,7 +286,7 @@ function Page() {
                         <div className="flex flex-1 flex-col gap-6 max-w-3xl mx-auto p-6">
                             <div className="flex items-start justify-between gap-4">
                                 <div className="flex flex-col gap-3">
-                                    <h1 className="text-2xl font-semibold">Autopilot Inbox</h1>
+                                    <h1 className="text-2xl font-semibold">Inbox</h1>
                                 </div>
                                 <Button
                                     aria-label="Configure ZeroOps"
@@ -299,7 +302,7 @@ function Page() {
                                 <InputGroup className="min-h-10">
                                     <InputGroupInput
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Ask Autopilot…"
+                                        placeholder="Ask ZeroOps…"
                                         value={searchQuery}
                                     />
                                     <InputGroupAddon align="inline-end">
@@ -313,6 +316,49 @@ function Page() {
                                         </Button>
                                     </InputGroupAddon>
                                 </InputGroup>
+
+                                <div className="flex flex-wrap gap-2 pt-1">
+                                    <svg
+                                        aria-hidden
+                                        className="absolute"
+                                        height="0"
+                                        width="0"
+                                    >
+                                        <defs>
+                                            <linearGradient
+                                                gradientUnits="userSpaceOnUse"
+                                                id="reply-icon-gradient"
+                                                x1="-1.16831"
+                                                x2="12.4619"
+                                                y1="1.18452"
+                                                y2="18.6312"
+                                            >
+                                                <stop offset="0.235" stopColor="#4299E0" />
+                                                <stop offset="0.47" stopColor="#CA42E0" />
+                                                <stop offset="0.76" stopColor="#FF5F46" />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+
+                                    <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none gap-1.5 w-fit" variant="secondary">
+                                        <ReplyIcon
+                                            className="[&_g_path]:[fill:url(#reply-icon-gradient)]"
+                                            onPointerEnterCapture={() => {}}
+                                            onPointerLeaveCapture={() => {}}
+                                            size={3.5}
+                                        />
+                                        <span>What can ZeroOps do?</span>
+                                    </Button>
+                                    <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none gap-1.5 w-fit" variant="secondary">
+                                        <ReplyIcon
+                                            className="[&_g_path]:[fill:url(#reply-icon-gradient)]"
+                                            onPointerEnterCapture={() => {}}
+                                            onPointerLeaveCapture={() => {}}
+                                            size={3.5}
+                                        />
+                                        <span>Configure ZeroOps</span>
+                                    </Button>
+                                </div>
 
                                 <section className="flex flex-col gap-2">
                                     <div className="flex items-center justify-between">
