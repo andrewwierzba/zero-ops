@@ -1,6 +1,6 @@
 'use client'
 
-import { AppIcon, SearchIcon } from '@databricks/design-system'
+import { AppIcon, ChevronDownIcon, SearchIcon } from '@databricks/design-system'
 
 import Image from 'next/image'
 import { useState } from 'react'
@@ -35,8 +35,8 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] flex flex-col h-screen overflow-hidden">
-            <div aria-label="Application header" className="items-center flex gap-2 justify-between p-2 shrink-0">
-                <div className="items-center flex gap-2">
+            <div aria-label="Application header" className="gap-2 grid grid-cols-4 justify-between p-2 shrink-0">
+                <div className="items-center flex gap-2 col-span-1">
                     <Button
                         aria-label="toggle-panel-1"
                         className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)] group"
@@ -51,9 +51,9 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
                         className="size-8"
                         src={databricksLogo}
                     />
-                    <span className="font-medium text-sm">Databricks App</span>
+                    <span className="text-[13px] font-medium truncate">Databricks App</span>
                 </div>
-                <div className="flex-1">
+                <div className="col-span-2">
                     <InputGroup className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)] rounded-[4px] flex-1 justify-self-center max-w-140">
                         <InputGroupAddon align="inline-start">
                             <InputGroupText>
@@ -72,7 +72,15 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
                         </InputGroupAddon>
                     </InputGroup>
                 </div>
-                <div aria-label="Application actions" className="items-center flex gap-1">
+                <div aria-label="Application actions" className="items-center flex gap-1 col-span-1 justify-end">
+                    <Button
+                        aria-label="Open workspace switcher"
+                        className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)] group max-w-50"
+                        variant="ghost"
+                    >
+                        <span className="text-[13px] truncate">Workspace (eu-west-2)</span>
+                        <ChevronDownIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} />
+                    </Button>
                     <Button
                         aria-label="Open Genie Code"
                         className="border-none rounded-[4px] group"
