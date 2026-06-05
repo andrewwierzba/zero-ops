@@ -1,9 +1,11 @@
 'use client'
 
-import { ChevronsLeftIcon, GitForkIcon, PlusIcon, SettingsIcon, ShareIcon } from 'lucide-react'
+import { ChevronDoubleLeftIcon, ForkIcon, GearIcon, PlusIcon, ShareIcon } from '@databricks/design-system'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { usePanelRef } from 'react-resizable-panels'
+
+import { GenieCodeIcon } from '@/app/assets/icons/genie-code'
 
 import { ApplicationContent, ApplicationShell } from '@/components/app/application-shell'
 import { Chatbox } from '@/components/app/chatbox'
@@ -18,10 +20,10 @@ function Page() {
     const threadsPanelRef = usePanelRef()
 
     function handleThreadsToggle() {
-        if (threadsOpen) {
-            threadsPanelRef.current?.collapse()
-        } else {
+        if (threadsPanelRef.current?.isCollapsed()) {
             threadsPanelRef.current?.expand()
+        } else {
+            threadsPanelRef.current?.collapse()
         }
     }
 
@@ -33,49 +35,71 @@ function Page() {
                         className="flex"
                         collapsedSize="48px"
                         collapsible
-                        defaultSize="200px"
+                        defaultSize="296px"
                         minSize="200px"
+                        onResize={() => {
+                            setThreadsOpen(!threadsPanelRef.current?.isCollapsed())
+                        }}
                         panelRef={threadsPanelRef}
-                        onResize={(size) => setThreadsOpen(size.inPixels > 48)}
                     >
                         <Threads onToggle={handleThreadsToggle} panelOpen={threadsOpen} />
                     </ResizablePanel>
                     <ResizableHandle />
                     <ResizablePanel className="flex flex-col text-[13px]" minSize="200px">
                         <div className="border-b flex gap-2 justify-between p-2 shrink-0">
-                            <div className="items-center flex gap-1">
+                            <div className="items-center flex gap-2 min-w-0">
                                 <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     onClick={() => router.push('/c')}
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <ChevronsLeftIcon className="size-4" />
+                                    <ChevronDoubleLeftIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
-                                <span className="font-semibold">New thread</span>
+                                <span className="text-[13px] font-semibold min-w-0 truncate">New thread</span>
                             </div>
                             <div className="items-center flex gap-1">
                                 <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     disabled
-                                    size="icon-sm"
+                                    size="icon"
                                     variant="ghost"
                                 >
-                                    <PlusIcon className="size-4" />
+                                    <PlusIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
-                                <Button size="icon-sm" variant="ghost">
-                                    <SettingsIcon className="size-4" />
+                                <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
+                                    size="icon"
+                                    variant="ghost"
+                                >
+                                    <GearIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
-                                <Button size="icon-sm" variant="ghost">
-                                    <ShareIcon className="size-4" />
+                                <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
+                                    size="icon"
+                                    variant="ghost"
+                                >
+                                    <ShareIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
-                                <Button size="icon-sm" variant="ghost">
-                                    <GitForkIcon className="size-4" />
+                                <Button
+                                    className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
+                                    size="icon"
+                                    variant="ghost"
+                                >
+                                    <ForkIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
                                 </Button>
                             </div>
                         </div>
                         <div className="flex-1 overflow-y-auto min-h-0">
                             <div className="flex flex-col min-h-full">
                                 <div className="flex-1 flex items-center justify-center p-6">
-                                    <span className="text-muted-foreground">New thread</span>
+                                    <div className="flex flex-col items-center gap-4">
+                                        <GenieCodeIcon size={64} />
+                                        <div className="flex flex-col gap-2 text-center">
+                                            <span className="text-2xl font-semibold">Genie Code</span>
+                                            <span className="text-muted-foreground">Send a message to start the conversation.</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] bottom-0 sticky">
                                     <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-t from-[rgb(255,255,255)] dark:from-[rgb(17,23,28)] to-transparent pointer-events-none" />
