@@ -95,7 +95,7 @@ export function CodeBlock({
                     <span>{filename}</span>
                 </div>
             )}
-            <pre className="py-4 overflow-x-auto">
+            <pre className="overflow-x-auto py-4">
                 <code>
                     {lineTokens?.map((tokens, index) => (
                         <CodeLine
