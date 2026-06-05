@@ -1,6 +1,6 @@
 'use client'
 
-import { SearchIcon } from '@databricks/design-system'
+import { OverflowIcon, SearchIcon } from '@databricks/design-system'
 import { InboxIcon, SquarePenIcon } from 'lucide-react'
 
 import { usePathname, useRouter } from 'next/navigation'
@@ -53,14 +53,31 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
         <div className="flex flex-col flex-1 overflow-hidden">
             <div className={`items-center border-b flex gap-2 ${panelOpen ? 'justify-between pl-3 pr-2' : 'justify-center px-2'} py-2`}>
                 {panelOpen && <span className="text-[13px] font-semibold">Genie Code</span>}
-                <Button
-                    className="group"
-                    onClick={onToggle}
-                    size="icon"
-                    variant="ghost"
-                >
-                    {panelOpen ? <PanelLeftOpenIcon /> : <PanelLeftCloseIcon />}
-                </Button>
+                
+                <div className="flex gap-1">
+                    <Button
+                        className="bg-hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)] group"
+                        onClick={onToggle}
+                        size="icon"
+                        variant="ghost"
+                    >
+                        {panelOpen ? <PanelLeftOpenIcon /> : <PanelLeftCloseIcon />}
+                    </Button>
+
+                    {panelOpen && (
+                        <Button
+                            className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)] group"
+                            size="icon"
+                            variant="ghost"
+                        >
+                            <OverflowIcon
+                                className="size-4"
+                                onPointerEnterCapture={() => {}}
+                                onPointerLeaveCapture={() => {}}
+                            />
+                        </Button>
+                    )}
+                </div>
             </div>
 
             {panelOpen && (
@@ -104,7 +121,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                             variant="ghost"
                         >
                             <InboxIcon className="size-4" />
-                            Autopilot Inbox
+                            Inbox
                         </Button>
                     </div>
 
