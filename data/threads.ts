@@ -17,6 +17,25 @@ export interface Thread {
 
 export const defaultThreads: Thread[] = [
     {
+        id: '11111111-0000-0000-0000-000000000011',
+        label: 'etl_orders_nightly failing with shuffle FetchFailedException retries',
+        created_at: '2026-04-20T10:10:00+00:00',
+        severity: 'critical',
+        status: 'investigating',
+        type: 'incident',
+        impact_assets: ['etl_orders_nightly', 'report_orders_daily'],
+        progress_updates: [
+            { description: 'Cascading stage retries detected', detail: 'Stage 14 of `etl_orders_nightly` retried 3 times in the last 2 hours; each retry failed with `FetchFailedException`.', status: 'completed', timestamp: '2026-04-20T10:10:00+00:00' },
+            { description: 'Executor logs parsed', detail: '11 `FetchFailedException`s across 3 stages, all referencing the same target host.', status: 'completed', timestamp: '2026-04-20T10:12:00+00:00' },
+            { description: 'Host eviction timeline reconstructed', detail: 'Worker `ip-10-0-4-87` was reclaimed by EC2 spot eviction at 09:47 UTC, mid-shuffle write of stage 14.', status: 'completed', timestamp: '2026-04-20T10:14:00+00:00' },
+            { description: 'Spark conf fix prepared', detail: 'Raised network timeout and shuffle retry budget so transient host loss is recoverable.', status: 'current', timestamp: '2026-04-20T10:16:00+00:00' },
+            { description: 'PR opened', status: 'pending', timestamp: '2026-04-20T10:18:00+00:00' },
+        ],
+        reported_by: 'Genie ZeroOps: Debug Databricks Job Failures',
+        root_cause_summary: 'Shuffle fetch retries are a symptom — a spot worker was evicted mid-shuffle and the shuffle service could not recover its blocks from the dead host.',
+        updated_at: '2026-04-20T10:16:00+00:00',
+    },
+    {
         id: '11111111-0000-0000-0000-000000000010',
         label: '3 claims processing jobs failing due to schema drift',
         created_at: '2026-04-20T10:00:00+00:00',
@@ -31,7 +50,8 @@ export const defaultThreads: Thread[] = [
             { description: 'PR opened', status: 'pending', timestamp: '2026-04-20T10:06:00+00:00' },
         ],
         reported_by: 'Genie ZeroOps: Debug Databricks Job Failures',
-        root_cause_summary: 'Upstream `claims.policy_id` was changed from INT to STRING; downstream joins fail with type mismatch.',
+        root_cause_summary: 'Upstream `claims_raw.policyholder_id` was changed from INT to STRING; downstream joins fail with type mismatch.',
+        scenario_id: 'claims-schema-drift-pr',
         updated_at: '2026-04-20T10:05:00+00:00',
     },
     {
@@ -56,7 +76,7 @@ export const defaultThreads: Thread[] = [
                 timestamp: '2026-04-20T09:31:00+00:00',
             },
             {
-                description: 'Spark plan analyzed - 6 issues found',
+                description: 'Spark plan analyzed - 4 issues found',
                 detail: 'Detected compounding shuffles, non-broadcast joins, and repeated table scans increasing end-to-end latency.',
                 status: 'completed',
                 timestamp: '2026-04-20T09:32:00+00:00',
@@ -111,7 +131,7 @@ export const defaultThreads: Thread[] = [
             { description: 'Mitigation patch drafted', status: 'pending', timestamp: '2026-04-20T09:10:00+00:00' },
         ],
         reported_by: 'Genie ZeroOps: Debug Databricks Job Failures',
-        root_cause_summary: 'A dbt cleanup migration dropped `customer_profile_snapshot` before downstream dependencies were updated.',
+        root_cause_summary: 'The upstream table `raw.crm_contacts` was dropped during an unannounced Unity Catalog migration; downstream jobs still reference the old location.',
         updated_at: '2026-04-20T09:10:00+00:00',
     },
     {

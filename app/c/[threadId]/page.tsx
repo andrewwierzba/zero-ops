@@ -13,15 +13,13 @@ import { PanelRightOpenIcon } from '@/app/assets/icons/panel-right-open'
 
 import { ApplicationContent, ApplicationShell } from '@/components/app/application-shell'
 import { Chatbox } from '@/components/app/chatbox'
-import { CodeBlock } from '@/components/app/code-block'
-import { CodeChange } from '@/components/app/code-change'
-import { Graph } from '@/components/app/graph'
+import { MessageContent } from '@/components/app/message-content'
+import { ThoughtBlock } from '@/components/app/thought-block'
 import Threads from '@/components/app/threads'
 import { useThreads } from '@/components/app/threads-context'
 
 import { Button } from '@/components/ui/button'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 import { MessageAction } from '@/data/messages'
@@ -67,96 +65,6 @@ const ProgressStatusLabel: Record<ThreadProgressStatus, string> = {
 function formatThoughtDuration(ms: number) {
     const seconds = Math.max(1, Math.round(ms / 1000))
     return `Thought for ${seconds} second${seconds === 1 ? '' : 's'}`
-}
-
-function parseMarkdownTable(tableText: string, key: number) {
-    const lines = tableText.trim().split('\n')
-    if (lines.length < 2) return null
-
-    const parseRow = (line: string) =>
-        line.split('|').slice(1, -1).map((cell) => cell.trim())
-
-    const headers = parseRow(lines[0])
-    const dataRows = lines.slice(2).map(parseRow)
-
-    return (
-        <Table key={key}>
-            <TableHeader>
-                <TableRow>
-                    {headers.map((header, i) => (
-                        <TableHead key={i}>{header}</TableHead>
-                    ))}
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {dataRows.map((row, rowIndex) => (
-                    <TableRow key={rowIndex}>
-                        {row.map((cell, cellIndex) => (
-                            <TableCell key={cellIndex}>{cell}</TableCell>
-                        ))}
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
-    )
-}
-
-function renderTextWithTables(text: string, baseKey: number) {
-    const segments: React.ReactNode[] = []
-    const tableRegex = /(\|.+\|[\r\n]+\|[-:\s|]+\|[\r\n]+(?:\|.+\|[\r\n]*)+)/g
-    let cursor = 0
-    let match: RegExpExecArray | null
-
-    while ((match = tableRegex.exec(text)) !== null) {
-        if (match.index > cursor) {
-            const before = text.slice(cursor, match.index).trim()
-            if (before) segments.push(<p className="whitespace-pre-wrap" key={baseKey + cursor}>{before}</p>)
-        }
-        segments.push(parseMarkdownTable(match[1], baseKey + match.index))
-        cursor = match.index + match[0].length
-    }
-
-    if (cursor < text.length) {
-        const remaining = text.slice(cursor).trim()
-        if (remaining) segments.push(<p className="whitespace-pre-wrap" key={baseKey + cursor}>{remaining}</p>)
-    }
-
-    return segments
-}
-
-function renderContent(content: string) {
-    const segments: React.ReactNode[] = []
-    const regex = /```(\w+)?\n([\s\S]*?)```/g
-    let cursor = 0
-    let match: RegExpExecArray | null
-
-    while ((match = regex.exec(content)) !== null) {
-        if (match.index > cursor) {
-            const text = content.slice(cursor, match.index).trim()
-            if (text) segments.push(...renderTextWithTables(text, cursor))
-        }
-        const language = match[1]
-        const code = match[2].trimEnd()
-        if (language === 'diff') {
-            const added: number[] = []
-            const removed: number[] = []
-            code.split('\n').forEach((line, i) => {
-                if (line.startsWith('+') && !line.startsWith('+++')) added.push(i + 1)
-                else if (line.startsWith('-') && !line.startsWith('---')) removed.push(i + 1)
-            })
-            segments.push(<CodeBlock addedLinesNumbers={added} hideLineNumbers key={match.index} removedLinesNumbers={removed}>{code}</CodeBlock>)
-        } else {
-            segments.push(<CodeBlock hideLineNumbers key={match.index} language={language}>{code}</CodeBlock>)
-        }
-        cursor = match.index + match[0].length
-    }
-
-    if (cursor < content.length) {
-        const text = content.slice(cursor).trim()
-        if (text) segments.push(...renderTextWithTables(text, cursor))
-    }
-
-    return segments
 }
 
 interface PageProps {
@@ -346,19 +254,15 @@ function Page({ params }: PageProps) {
                                                     ) : (
                                                         <div className="flex flex-col gap-2 w-full">
                                                             {/* Removed: max-w-prose */}
-                                                            {message.thought_duration_ms != null && (
+                                                            {message.thought ? (
+                                                                <ThoughtBlock {...message.thought} codeChanges={message.code_changes} />
+                                                            ) : message.thought_duration_ms != null ? (
                                                                 <div className="text-muted-foreground text-xs">
                                                                     {formatThoughtDuration(message.thought_duration_ms)}
                                                                 </div>
-                                                            )}
-                                                            {message.embed === 'graph' && (
-                                                                <div className="border rounded-md overflow-hidden h-64">
-                                                                    <Graph className="h-full" />
-                                                                </div>
-                                                            )}
+                                                            ) : null}
                                                             <div className="flex flex-col gap-3">
-                                                                {renderContent(message.content)}
-                                                                {message.code_changes && <CodeChange {...message.code_changes} />}
+                                                                <MessageContent codeChanges={message.code_changes} content={message.content} onAction={handleSubmit} />
                                                             </div>
                                                             {message.id === latestAgentMessageId && message.suggestions && message.suggestions.length > 0 && (
                                                                 <div className="flex flex-wrap gap-2 pt-1">
@@ -467,8 +371,8 @@ function Page({ params }: PageProps) {
                                     )}
                                 </div>
                                 <div className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] bottom-0 sticky">
-                                    <div className="absolute inset-x-0 -top-8 h-8 bg-gradient-to-t from-[rgb(255,255,255)] dark:from-[rgb(17,23,28)] to-transparent pointer-events-none" />
-                                    <div className="max-w-3xl mx-auto px-6 pb-6">
+                                    <div className="bg-gradient-to-t from-[rgb(255,255,255)] dark:from-[rgb(17,23,28)] to-transparent h-6 inset-x-0 pointer-events-none absolute -top-6" />
+                                    <div className="max-w-3xl mx-auto pb-6">
                                         <Chatbox
                                             className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)]"
                                             onSubmit={handleSubmit}

@@ -1,14 +1,16 @@
 'use client'
 
-import { ChevronDownIcon, PlusMinusSquareIcon } from '@databricks/design-system'
+import { PlusMinusSquareIcon } from '@databricks/design-system'
 
 import { useState } from 'react'
 
 import { CodeBlock } from '@/components/app/code-block'
+import { Preview, PreviewContent, PreviewTrigger } from '@/components/app/preview'
 import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible'
 
-import { CodeChange as CodeChangeProps, CodeChangeFile } from '@/data/messages'
+import { cn } from '@/lib/utils'
+
+import { CodeChange as CodeChangeProps, CodeChangeAction, CodeChangeFile } from '@/data/messages'
 
 type DiffCounts = { added: number; removed: number }
 
@@ -22,79 +24,135 @@ function countDiff(code: string): DiffCounts {
     return { added, removed }
 }
 
-function diffLineNumbers(code: string): { addedLinesNumbers: number[]; removedLinesNumbers: number[] } {
-    const addedLinesNumbers: number[] = []
-    const removedLinesNumbers: number[] = []
-    code.split('\n').forEach((line, i) => {
-        if (line.startsWith('+') && !line.startsWith('+++')) addedLinesNumbers.push(i + 1)
-        else if (line.startsWith('-') && !line.startsWith('---')) removedLinesNumbers.push(i + 1)
-    })
-    return { addedLinesNumbers, removedLinesNumbers }
+const FILENAME_LANGUAGE_MAP: Record<string, string> = {
+    py: 'python',
+    sql: 'sql',
+    scala: 'scala',
+    ts: 'typescript',
+    tsx: 'tsx',
+    js: 'javascript',
+    jsx: 'jsx',
+    yaml: 'yaml',
+    yml: 'yaml',
+    json: 'json',
+    md: 'markdown',
+    sh: 'bash',
+    bash: 'bash',
+}
+
+function languageFromFilename(filename: string): string | undefined {
+    const ext = filename.split('.').pop()?.toLowerCase()
+    return ext ? FILENAME_LANGUAGE_MAP[ext] : undefined
 }
 
 function DiffCount({ added, removed }: DiffCounts) {
     return (
-        <span className="items-center inline-flex gap-1 tabular-nums">
+        <span className="flex font-bold gap-1">
             <span className="text-[rgb(39,124,67)]">+{added}</span>
-            <span className="text-[rgb(200,45,76)]">−{removed}</span>
+            <span className="text-[rgb(200,45,76)]">-{removed}</span>
         </span>
     )
 }
 
-function CollapsibleFile({ file, showCounts }: { file: CodeChangeFile; showCounts: boolean }) {
-    const [open, setOpen] = useState(true)
+function SingleFilePreview({ file }: { file: CodeChangeFile }) {
+    const [open, setOpen] = useState(false)
     const isDiff = file.language === 'diff'
     const counts = isDiff ? countDiff(file.code) : null
-    const { addedLinesNumbers, removedLinesNumbers } = isDiff
-        ? diffLineNumbers(file.code)
-        : { addedLinesNumbers: [], removedLinesNumbers: [] }
 
     return (
-        <div>
-            <Collapsible onOpenChange={setOpen} open={open}>
-                <CollapsibleTrigger className="items-center hover:bg-rgb[0,0,0]/5 dark:hover:bg-[rgb(255,255,255)]/5 flex gap-3 text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] text-xs font-semibold justify-between px-3 py-2 transition-colors w-full">
-                    <div className="items-center flex flex-1 gap-2 justify-between min-w-0">
-                        <span className="font-mono min-w-0 truncate">
-                            {file.filename}
-                        </span>
-                        <ChevronDownIcon
-                            className={`${open ? '' : '-rotate-90'} shrink-0 size-3.5 transition-transform`}
-                            onPointerEnterCapture={() => {}}
-                            onPointerLeaveCapture={() => {}}
-                        />
-                    </div>
-                    {showCounts && counts && <DiffCount {...counts} />}
-                </CollapsibleTrigger>
-            </Collapsible>
-            {open && (
-                <div className="border-[rgb(235,235,235)] dark:border-[rgb(31,39,45)] border-t">
+        <Preview
+            className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border border-[rgb(235,235,235)] dark:border-[rgb(31,39,45)]"
+            onOpenChange={setOpen}
+            open={open}
+        >
+            <PreviewTrigger open={open}>
+                <span className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1">
+                    <PlusMinusSquareIcon
+                        className="[&>svg]:text-[rgb(111,111,111)] dark:[&>svg]:text-[rgb(146,164,179)]"
+                        onPointerEnterCapture={() => {}}
+                        onPointerLeaveCapture={() => {}}
+                    />
+                </span>
+                <div className="items-center flex flex-1 gap-2 text-left">
+                    <span>{file.filename}</span>
+                    {counts && <DiffCount {...counts} />}
+                </div>
+            </PreviewTrigger>
+            <PreviewContent className="border-inherit p-0">
                 <CodeBlock
-                    addedLinesNumbers={addedLinesNumbers}
-                    className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] border-0 rounded-none"
-                    hideLineNumbers
-                    language={file.language}
-                    removedLinesNumbers={removedLinesNumbers}
+                    className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] border-none rounded-none w-full"
+                    diff={isDiff}
+                    language={isDiff ? languageFromFilename(file.filename) : file.language}
                 >
                     {file.code}
                 </CodeBlock>
-                </div>
-            )}
-        </div>
+            </PreviewContent>
+        </Preview>
     )
 }
 
-export function CodeChange({ actions, files, style }: CodeChangeProps) {
+function GroupFilePreview({ file, hideDiffCount }: { file: CodeChangeFile; hideDiffCount?: boolean }) {
+    const [open, setOpen] = useState(false)
+    const isDiff = file.language === 'diff'
+    const counts = isDiff && !hideDiffCount ? countDiff(file.code) : null
+
+    return (
+        <Preview className="bg-inherit border-x-0 border-b-0 border-t rounded-none" onOpenChange={setOpen} open={open}>
+            <PreviewTrigger open={open}>
+                <div className="items-center flex flex-1 gap-2 text-left">
+                    <span>{file.filename}</span>
+                    {counts && <DiffCount {...counts} />}
+                </div>
+            </PreviewTrigger>
+            <PreviewContent className="border-inherit p-0">
+                <CodeBlock
+                    className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] border-none rounded-none w-full"
+                    diff={isDiff}
+                    language={isDiff ? languageFromFilename(file.filename) : file.language}
+                >
+                    {file.code}
+                </CodeBlock>
+            </PreviewContent>
+        </Preview>
+    )
+}
+
+function ActionButton({ action, onClick }: { action: CodeChangeAction; onClick?: () => void }) {
+    const variant = action.variant ?? 'secondary'
+    const isPrimary = variant === 'primary'
+    const isDestructive = variant === 'destructive'
+    const Icon = action.icon
+
+    return (
+        <Button
+            className={cn(
+                'rounded-[4px] font-normal',
+                !isPrimary && !isDestructive &&
+                    'hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(138,202,255)]/8 border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)] hover:border-[rgb(34,114,180)] dark:hover:border-[rgb(138,202,255)] text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] hover:text-[rgb(34,114,180)] dark:hover:text-[rgb(138,202,255)]',
+                isPrimary &&
+                    'bg-[rgb(34,114,180)] hover:bg-[rgb(14,83,139)] dark:bg-[rgb(66,153,224)] dark:hover:bg-[rgb(138,202,255)] text-[rgb(255,255,255)] dark:text-[rgb(17,23,28)]',
+            )}
+            data-icon={Icon ? 'inline-start' : undefined}
+            onClick={onClick}
+            size="sm"
+            variant={isPrimary ? 'default' : isDestructive ? 'destructive' : 'outline'}
+        >
+            {Icon && <Icon className="size-4" />}
+            {action.label}
+        </Button>
+    )
+}
+
+export function CodeChange({ actions, files, onAction, style }: CodeChangeProps & { onAction?: (label: string) => void }) {
     if (files.length === 0) return null
 
-    if (style === 'single') {
-        const file = files[0]
-        return (
-            <div className="border rounded-lg overflow-hidden">
-                <CollapsibleFile file={file} showCounts />
-            </div>
-        )
+    const hasActions = !!actions && actions.length > 0
+
+    if (style === 'single' && !hasActions) {
+        return <SingleFilePreview file={files[0]} />
     }
 
+    const isSingle = files.length === 1
     const totals = files.reduce<DiffCounts>(
         (acc, file) => {
             if (file.language !== 'diff') return acc
@@ -104,39 +162,39 @@ export function CodeChange({ actions, files, style }: CodeChangeProps) {
         { added: 0, removed: 0 }
     )
     const hasDiff = files.some((file) => file.language === 'diff')
-    const fileLabel = `${files.length} ${files.length === 1 ? 'file' : 'files'} changed`
-    const showPerFileCounts = files.length > 1
+    const headerLabel = isSingle ? files[0].filename : `${files.length} files changed`
+    const headerCounts = isSingle && files[0].language === 'diff' ? countDiff(files[0].code) : totals
 
     return (
-        <div className="border rounded-lg overflow-hidden">
-            <div className="items-center border-[rgb(235,235,235)] dark:border-[rgb(31,39,45)] flex text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] text-[13px] font-semibold gap-2 px-3 py-2">
-                <div className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] flex justify-center size-6">
-                    <PlusMinusSquareIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} />
+        <div className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border border-[rgb(235,235,235)] dark:border-[rgb(31,39,45)] rounded-lg text-[13px] overflow-hidden">
+            <div className="items-center flex flex-1 gap-2 justify-between px-2 py-2 text-left">
+                <div className="items-center flex gap-2">
+                    <span className="items-center bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex justify-center size-6">
+                        <PlusMinusSquareIcon
+                            className="[&>svg]:text-[rgb(111,111,111)] dark:[&>svg]:text-[rgb(146,164,179)]"
+                            onPointerEnterCapture={() => {}}
+                            onPointerLeaveCapture={() => {}}
+                        />
+                    </span>
+                    <span>{headerLabel}</span>
+                    {hasDiff && <DiffCount {...headerCounts} />}
                 </div>
-                <span>{fileLabel}</span>
-                {hasDiff && <DiffCount {...totals} />}
-                {actions && actions.length > 0 && (
-                    <div className="items-center flex gap-1 ml-auto">
-                        {actions.map((action) => (
-                            <Button
+                {hasActions && (
+                    <div className="items-center flex gap-1">
+                        {actions!.map((action) => (
+                            <ActionButton
+                                action={action}
                                 key={action.label}
-                                size="sm"
-                                variant="outline"
-                            >
-                                {action.label}
-                            </Button>
+                                onClick={onAction ? () => onAction(action.label) : undefined}
+                            />
                         ))}
                     </div>
                 )}
             </div>
 
-            <div className="border-[rgb(235,235,235)] dark:border-[rgb(31,39,45)] border-t">
+            <div>
                 {files.map((file) => (
-                    <CollapsibleFile
-                        file={file}
-                        key={file.filename}
-                        showCounts={showPerFileCounts}
-                    />
+                    <GroupFilePreview file={file} hideDiffCount={isSingle} key={file.filename} />
                 ))}
             </div>
         </div>

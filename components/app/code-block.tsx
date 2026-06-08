@@ -64,29 +64,76 @@ function tokenize(code: string, language?: string): PrismToken[][] {
 type CodeBlockProps = React.HTMLAttributes<HTMLDivElement> & {
     addedLinesNumbers?: number[];
     children: React.ReactNode;
+    diff?: boolean;
     filename?: string;
     hideLineNumbers?: boolean;
+    inset?: boolean;
     language?: string;
     removedLinesNumbers?: number[];
 };
+
+type DiffLineKind = 'added' | 'removed' | 'context';
+
+function classifyDiffLine(line: string): DiffLineKind {
+    if (line.startsWith('+++') || line.startsWith('---')) return 'context';
+    if (line.startsWith('+')) return 'added';
+    if (line.startsWith('-')) return 'removed';
+    return 'context';
+}
+
+function stripDiffPrefix(line: string): string {
+    if (line.startsWith('+++') || line.startsWith('---')) return line;
+    if (line.startsWith('+') || line.startsWith('-') || line.startsWith(' ')) return line.slice(1);
+    return line;
+}
+
+function parseDiff(code: string): { strippedCode: string; kinds: DiffLineKind[]; lineNumbers: (number | null)[] } {
+    const rawLines = code.split(/\r\n|\r|\n/);
+    const kinds = rawLines.map(classifyDiffLine);
+    const strippedLines = rawLines.map(stripDiffPrefix);
+    const lineNumbers: (number | null)[] = [];
+    let newLineNo = 1;
+    for (const kind of kinds) {
+        if (kind === 'removed') {
+            lineNumbers.push(null);
+        } else {
+            lineNumbers.push(newLineNo);
+            newLineNo += 1;
+        }
+    }
+    return { strippedCode: strippedLines.join('\n'), kinds, lineNumbers };
+}
 
 export function CodeBlock({
     addedLinesNumbers,
     children,
     className,
+    diff,
     filename,
     hideLineNumbers,
+    inset,
     language,
     removedLinesNumbers,
     ...props
 }: CodeBlockProps) {
     const code = typeof children === 'string' ? children : null;
-    const lineTokens = code ? tokenize(code, language) : null;
+
+    let displayCode = code;
+    let diffKinds: DiffLineKind[] | null = null;
+    let diffLineNumbers: (number | null)[] | null = null;
+    if (diff && code != null) {
+        const parsed = parseDiff(code);
+        displayCode = parsed.strippedCode;
+        diffKinds = parsed.kinds;
+        diffLineNumbers = parsed.lineNumbers;
+    }
+
+    const lineTokens = displayCode ? tokenize(displayCode, language) : null;
 
     return (
         <div
             aria-label="code-block"
-            className={cn('bg-muted border border-neutral-200 dark:border-neutral-800 rounded-lg text-neutral-700 dark:text-neutral-200 flex flex-col text-sm overflow-hidden', className)}
+            className={cn('bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] border border-neutral-200 dark:border-neutral-800 rounded-lg text-neutral-700 dark:text-neutral-200 flex flex-col text-[13px] overflow-hidden', className)}
             {...props}
         >
             {filename && (
@@ -95,17 +142,30 @@ export function CodeBlock({
                     <span>{filename}</span>
                 </div>
             )}
-            <pre className="overflow-x-auto py-4">
+            <pre className={cn('overflow-x-auto py-4', inset && 'px-4')}>
                 <code>
-                    {lineTokens?.map((tokens, index) => (
-                        <CodeLine
-                            hideLineNumbers={hideLineNumbers}
-                            key={index}
-                            lineNumber={index + 1}
-                            tokens={tokens}
-                            variant={addedLinesNumbers?.includes(index + 1) ? 'added' : removedLinesNumbers?.includes(index + 1) ? 'removed' : undefined}
-                        />
-                    ))}
+                    {lineTokens?.map((tokens, index) => {
+                        if (diff && diffKinds && diffLineNumbers) {
+                            const kind = diffKinds[index];
+                            return (
+                                <CodeLine
+                                    key={index}
+                                    lineNumber={diffLineNumbers[index]}
+                                    tokens={tokens}
+                                    variant={kind === 'added' ? 'added' : kind === 'removed' ? 'removed' : undefined}
+                                />
+                            );
+                        }
+                        return (
+                            <CodeLine
+                                hideLineNumbers={hideLineNumbers}
+                                key={index}
+                                lineNumber={index + 1}
+                                tokens={tokens}
+                                variant={addedLinesNumbers?.includes(index + 1) ? 'added' : removedLinesNumbers?.includes(index + 1) ? 'removed' : undefined}
+                            />
+                        );
+                    })}
                 </code>
             </pre>
         </div>
@@ -113,7 +173,7 @@ export function CodeBlock({
 }
 
 const codeLineVariants = cva(
-    'items-center bg-muted flex',
+    'items-center flex',
     {
         variants: {
             variant: {
@@ -125,7 +185,7 @@ const codeLineVariants = cva(
 );
 
 const codeLineNumberVariants = cva(
-    'sticky left-0 bg-inherit box-content text-neutral-500 dark:text-neutral-400 tabular-nums pl-4 pr-4 shrink-0 text-right w-4',
+    'bg-inherit box-content text-neutral-500 dark:text-neutral-400 left-0 pl-4 pr-4 sticky shrink-0 tabular-nums text-right w-4',
     {
         variants: {
             variant: {
@@ -139,13 +199,13 @@ const codeLineNumberVariants = cva(
 type CodeLineProps = React.HTMLAttributes<HTMLDivElement> &
     VariantProps<typeof codeLineVariants> & {
         hideLineNumbers?: boolean;
-        lineNumber?: number;
+        lineNumber?: number | null;
         tokens: PrismToken[];
     };
 
 export function CodeLine({ className, hideLineNumbers, id, lineNumber, tokens, variant, ...props }: CodeLineProps) {
     const lineId = useId();
-    const resolvedId = id ?? `${lineId}-l${lineNumber}`;
+    const resolvedId = id ?? `${lineId}-l${lineNumber ?? 'blank'}`;
 
     return (
         <div
@@ -161,7 +221,7 @@ export function CodeLine({ className, hideLineNumbers, id, lineNumber, tokens, v
                     tabIndex={-1}
                     type="button"
                 >
-                    {lineNumber}
+                    {lineNumber ?? ''}
                 </button>
             )}
             <div>

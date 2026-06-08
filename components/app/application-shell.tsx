@@ -3,9 +3,10 @@
 import { AppIcon, ChevronDownIcon, SearchIcon } from '@databricks/design-system'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 
-import databricksLogo from '@/app/assets/databricks.png'
+import databricksLockupLight from '@/app/assets/primary-lockup-full-color-rgb.svg'
+import databricksLockupDark from '@/app/assets/primary-lockup-full-color-white-rgb.svg'
 
 import { PanelLeftCloseIcon } from '@/app/assets/icons/panel-left-close'
 import { PanelLeftOpenIcon } from '@/app/assets/icons/panel-left-open'
@@ -30,8 +31,32 @@ function ApplicationContent({ children }: { children: React.ReactNode }) {
 
 const genieGradient = 'linear-gradient(38deg, rgba(66,153,224,0.1) 23.5%, rgba(202,66,224,0.1) 47%, rgba(255,95,70,0.1) 76%)';
 
+type SidebarOpenContextValue = {
+    open: boolean
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const SidebarOpenContext = createContext<SidebarOpenContextValue | null>(null)
+
+function SidebarProvider({ children }: { children: React.ReactNode }) {
+    const [open, setOpen] = useState(false)
+    return (
+        <SidebarOpenContext value={{ open, setOpen }}>
+            {children}
+        </SidebarOpenContext>
+    )
+}
+
+function useSidebarOpen(): SidebarOpenContextValue {
+    const ctx = useContext(SidebarOpenContext)
+    const localState = useState(false)
+    if (ctx) return ctx
+    const [open, setOpen] = localState
+    return { open, setOpen }
+}
+
 function ApplicationShell({ children }: { children: React.ReactNode }) {
-    const [sideBarOpen, setSidebarOpen] = useState(false);
+    const { open: sideBarOpen, setOpen: setSidebarOpen } = useSidebarOpen();
 
     return (
         <div className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] flex flex-col h-screen overflow-hidden">
@@ -48,10 +73,14 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
                     </Button>
                     <Image
                         alt="Databricks"
-                        className="size-8"
-                        src={databricksLogo}
+                        className="h-4 w-auto dark:hidden"
+                        src={databricksLockupLight}
                     />
-                    <span className="text-[13px] font-medium truncate">Databricks App</span>
+                    <Image
+                        alt="Databricks"
+                        className="h-4 w-auto hidden dark:block"
+                        src={databricksLockupDark}
+                    />
                 </div>
                 <div className="col-span-2">
                     <InputGroup className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)] rounded-[4px] flex-1 justify-self-center max-w-140">
@@ -73,6 +102,9 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
                     </InputGroup>
                 </div>
                 <div aria-label="Application actions" className="items-center flex gap-1 col-span-1 justify-end">
+                    <div className="bg-[rgb(240,0,64)]/6 dark:bg-[rgb(240,0,64)]/10 rounded-[4px] text-[rgb(100,23,43)] dark:text-[rgb(254,210,255)] text-[13px] leading-[20px] px-1">
+                        Production
+                    </div>
                     <Button
                         aria-label="Open workspace switcher"
                         className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)] group max-w-50"
@@ -119,4 +151,4 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
     );
 }
 
-export { ApplicationShell, ApplicationContent }
+export { ApplicationShell, ApplicationContent, SidebarProvider }

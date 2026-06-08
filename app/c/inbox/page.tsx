@@ -275,7 +275,7 @@ function Page() {
                         className="flex"
                         collapsedSize="48px"
                         collapsible
-                        defaultSize="200px"
+                        defaultSize="296px"
                         minSize="200px"
                         panelRef={threadsPanelRef}
                     >
@@ -286,20 +286,21 @@ function Page() {
                         <div className="flex flex-1 flex-col gap-6 max-w-3xl mx-auto p-6">
                             <div className="flex items-start justify-between gap-4">
                                 <div className="flex flex-col gap-3">
-                                    <h1 className="text-2xl font-semibold">Inbox</h1>
+                                    <h1 className="text-2xl font-bold">Inbox</h1>
                                 </div>
                                 <Button
                                     aria-label="Configure ZeroOps"
+                                    className="rounded-[4px] text-[13px] leading-[20px]"
                                     onClick={handleConfigure}
                                     variant="outline"
                                 >
                                     <SlidersHorizontal className="size-4" />
-                                    Configure
+                                    <span>Configure</span>
                                 </Button>
                             </div>
 
                             <div className="flex flex-col gap-3">
-                                <InputGroup className="min-h-10">
+                                <InputGroup className="border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)] rounded-full text-[13px] leading-[20px] min-h-10 pr-0.5">
                                     <InputGroupInput
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         placeholder="Ask ZeroOps…"
@@ -340,7 +341,7 @@ function Page() {
                                         </defs>
                                     </svg>
 
-                                    <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none gap-1.5 w-fit" variant="secondary">
+                                    <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none text-[13px] leading-[20px] gap-1.5 w-fit" variant="secondary">
                                         <ReplyIcon
                                             className="[&_g_path]:[fill:url(#reply-icon-gradient)]"
                                             onPointerEnterCapture={() => {}}
@@ -349,7 +350,7 @@ function Page() {
                                         />
                                         <span>What can ZeroOps do?</span>
                                     </Button>
-                                    <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none gap-1.5 w-fit" variant="secondary">
+                                    <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none text-[13px] leading-[20px] gap-1.5 w-fit" variant="secondary">
                                         <ReplyIcon
                                             className="[&_g_path]:[fill:url(#reply-icon-gradient)]"
                                             onPointerEnterCapture={() => {}}
@@ -362,7 +363,7 @@ function Page() {
 
                                 <section className="flex flex-col gap-2">
                                     <div className="flex items-center justify-between">
-                                        <h2 className="text-sm font-medium text-muted-foreground">Insights</h2>
+                                        <h2 className="text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] text-[13px] font-bold leading-[20px]">Insights</h2>
                                         {filterDropdown}
                                     </div>
                                     <ThreadsTable emptyLabel="No active threads" onSelect={(id) => router.push(`/c/${id}`)} rows={filterThreads(activeThreads)} />

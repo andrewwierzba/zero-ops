@@ -44,4 +44,17 @@ export const scenarios: Record<string, Scenario> = {
             },
         ],
     },
+    'claims-schema-drift-pr': {
+        id: 'claims-schema-drift-pr',
+        steps: [
+            {
+                promptMatch: 'create pull request',
+                thoughtDurationMs: 2000,
+                reply: {
+                    content:
+                        'PR created.\n\n- Branch: `fix/cast-policyholder-id-to-string`\n- Commit: `a3f5b9c`\n- PR link: [#482 Cast policyholder_id to STRING in claims enrichment join](#)',
+                },
+            },
+        ],
+    },
 }

@@ -17,7 +17,7 @@ import Threads from '@/components/app/threads'
 import { useThreads } from '@/components/app/threads-context'
 
 import { Button } from '@/components/ui/button'
-import { Combobox, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxGroupLabel, ComboboxItem, ComboboxLabel, ComboboxList } from '@/components/ui/combobox'
+import { Combobox, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxItem, ComboboxLabel, ComboboxList } from '@/components/ui/combobox'
 import { Field, FieldTitle } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'

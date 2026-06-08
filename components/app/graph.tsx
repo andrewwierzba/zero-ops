@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo } from 'react'
 import ReactFlow, {
     Background,
     Controls,
@@ -10,64 +10,69 @@ import ReactFlow, {
     NodeTypes,
     BackgroundVariant,
     Position,
-} from "reactflow"
-import "reactflow/dist/style.css"
+} from 'reactflow'
+import 'reactflow/dist/style.css'
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils'
 
-import { CheckCircleIcon, NotebookIcon } from "lucide-react"
+import { CheckCircleIcon, GridDashIcon } from '@databricks/design-system'
 
-import { Separator } from "@/components/ui/separator"
+import { Separator } from '@/components/ui/separator'
 
-// Custom Node Component
+import { GraphDef, GraphStepContent } from '@/data/graphs'
+
 interface StepNodeData {
-    content?: React.ReactNode;
+    content?: GraphStepContent;
+    icon?: React.ElementType;
     label: string;
     showSource?: boolean;
     showTarget?: boolean;
-    status?: "success";
+    status?: 'success';
     taskType?: string;
 }
 
 function StepNode({ data }: { data: StepNodeData }) {
+    const Icon = data.icon ?? GridDashIcon
+
     return (
         <div
-            aria-label="graph-step"
-            className="bg-white relative rounded-sm shadow-xs w-[240px]"
+            aria-label='graph-step'
+            className='bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] rounded-[4px] relative shadow-xs w-[240px]'
         >
-            {data.showTarget !== false && <Handle className="!bg-gray-300 !border-none !h-2 !w-2" position={Position.Left} type="target" />}
-            {data.showSource !== false && <Handle className="!bg-gray-300 !border-none !h-2 !w-2" position={Position.Right} type="source" />}
-            <div className="items-center flex gap-2 p-2">
-                <div aria-label="step-icon" className="bg-gray-100 rounded-sm flex h-6 p-1 w-6">
-                    <NotebookIcon
+            {data.showTarget !== false && <Handle className='!bg-[rgb(235,235,235)] dark:bg-[rgb(31,39,45)] !border-none !h-2 !w-2' position={Position.Left} type='target' />}
+            {data.showSource !== false && <Handle className='!bg-[rgb(235,235,235)] dark:bg-[rgb(31,39,45)] !border-none !h-2 !w-2' position={Position.Right} type='source' />}
+            <div className='items-center flex gap-2 p-2'>
+                <div aria-label='step-icon' className='bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1'>
+                    <Icon
+                        className='rounded-[4px] p-0.5 [&>svg]:text-[rgb(111,111,111)] dark:[&>svg]:text-[rgb(146,164,179)]'
                         onPointerEnterCapture={undefined}
                         onPointerLeaveCapture={undefined}
-                        style={{
-                            color: "var(--du-bois-color-text-secondary)",
-                        }}
                     />
                 </div>
-                <span aria-label="step-name" className="text-sm font-semibold flex-1 truncate">
+                <span aria-label='step-name' className='text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] text-sm font-semibold flex-1 truncate'>
                     {data.label}
                 </span>
-                {data.status === "success" && (
-                    <div aria-label="step-status" className="flex h-6 items-center justify-center w-6">
+                {data.status === 'success' && (
+                    <div aria-label='step-status' className='flex h-6 items-center justify-center w-6'>
                         <CheckCircleIcon
+                            className='[&>svg]:text-[rgb(39,124,67)] dark:[&>svg]:text-[rgb(59,166,94)]'
                             onPointerEnterCapture={undefined}
                             onPointerLeaveCapture={undefined}
-                            style={{
-                                color: "var(--du-bois-color-validation-success)",
-                            }}
                         />
                     </div>
                 )}
             </div>
-            <Separator className="bg-gray-200" />
-            <div aria-label="" className="min-w-0 overflow-hidden p-2">
+            <Separator className='border-[rgb(235,235,235)] dark:border-[rgb(31,39,45)]' />
+            <div aria-label='' className='min-w-0 overflow-hidden p-2'>
                 {data?.content ? (
-                    data.content
+                    <div className='flex gap-1'>
+                        <span className='text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]'>{data.content.label}:</span>
+                        <span className='text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] truncate' title={data.content.value}>
+                            {data.content.value}
+                        </span>
+                    </div>
                 ) : (
-                    <div className="bg-gray-50 border border-gray-200 border-dashed h-[60px] rounded" />
+                    <div className='bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] border bg-[rgb(235,235,235)] dark:bg-[rgb(31,39,45)] border-dashed h-[60px] rounded' />
                 )}
             </div>
         </div>
@@ -78,82 +83,37 @@ const nodeTypes: NodeTypes = {
     step: StepNode,
 }
 
-export function Graph({ className, onNodeClick }: { className?: string; onNodeClick?: (nodeId: string, data: StepNodeData) => void }) {
-    const initialNodes: Node[] = useMemo(() => [
-        { 
-            id: "0", 
-            type: "step",
-            position: { x: 50, y: 50 },
-            data: { 
-                content: 
-                    <div className="flex gap-1">
-                        <span className="text-neutral-500">Source:</span>
-                        <span className="bg-neutral-200 block rounded-sm px-1.5 truncate" title="/pipelines/bronze/raw_claims_events">/pipelines/bronze/raw_claims_events</span>
-                    </div>,
-                label: "Ingest claims events",
-                showTarget: false,
-                taskType: "notebook",
-            }
+export function Graph({ className, graph, onNodeClick }: { className?: string; graph: GraphDef; onNodeClick?: (nodeId: string, data: StepNodeData) => void }) {
+    const initialNodes: Node[] = useMemo(() => graph.nodes.map((node) => ({
+        id: node.id,
+        type: 'step',
+        position: node.position,
+        data: {
+            content: node.content,
+            icon: node.icon,
+            label: node.label,
+            showSource: node.showSource,
+            showTarget: node.showTarget,
+            status: node.status,
+            taskType: node.taskType,
         },
-        { 
-            id: "1", 
-            type: "step",
-            position: { x: 340, y: 50 },
-            data: { 
-                content: 
-                    <div className="flex gap-1">
-                        <span className="text-neutral-500">Job:</span>
-                        <span className="bg-neutral-200 block rounded-sm px-1.5 truncate" title="/workflows/claims/etl_claims_daily">/workflows/claims/etl_claims_daily</span>
-                    </div>,
-                label: "etl_claims_daily",
-                taskType: "python-script",
-            }
-        },
-        { 
-            id: "2", 
-            type: "step",
-            position: { x: 630, y: 50 },
-            data: { 
-                content: 
-                    <div className="flex gap-1">
-                        <span className="text-neutral-500">Table:</span>
-                        <span className="bg-neutral-200 block rounded-sm px-1.5 truncate" title="/pipelines/silver/claims_enriched">/pipelines/silver/claims_enriched</span>
-                    </div>,
-                label: "Enrich claims",
-                taskType: "sql",
-            }
-        },
-        { 
-            id: "3", 
-            type: "step",
-            position: { x: 920, y: 50 },
-            data: { 
-                content: 
-                    <div className="flex gap-1">
-                        <span className="text-neutral-500">Target:</span>
-                        <span className="bg-neutral-200 block rounded-sm px-1.5 truncate" title="/pipelines/gold/claims_processing_dashboard">/pipelines/gold/claims_processing_dashboard</span>
-                    </div>,
-                label: "claims_processing_dashboard",
-                showSource: false,
-                taskType: "pipeline",
-            }
-        },
-    ], [])
+    })), [graph])
 
     const handleNodeClick = useCallback((_: React.MouseEvent, node: Node<StepNodeData>) => {
         onNodeClick?.(node.id, node.data);
     }, [onNodeClick]);
 
-    const initialEdges: Edge[] = useMemo(() => [
-        { id: "e0-1", source: "0", target: "1", type: "smoothstep" },
-        { id: "e1-2", source: "1", target: "2", type: "smoothstep" },
-        { id: "e2-3", source: "2", target: "3", type: "smoothstep" },
-    ], [])
+    const initialEdges: Edge[] = useMemo(() => graph.edges.map((edge) => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        type: 'smoothstep',
+    })), [graph])
 
     return (
         <div
-            aria-label="directed-acyclic-graph" 
-            className={cn("bg-gray-50", className)}
+            aria-label='directed-acyclic-graph' 
+            className={cn('bg-background', className)}
         >
             <ReactFlow
                 edges={initialEdges}
@@ -162,14 +122,16 @@ export function Graph({ className, onNodeClick }: { className?: string; onNodeCl
                 nodes={initialNodes}
                 nodeTypes={nodeTypes}
                 onNodeClick={handleNodeClick}
+                proOptions={{ hideAttribution: true }}
             >
-                <Background 
-                    color="#e5e7eb"
+                <Background
+                    className='bg-[rgb(247,247,247]/5 dark:bg-[rgb(31,39,45]/5'
                     gap={12} 
                     size={1}
                     variant={BackgroundVariant.Dots} 
                 />
-                <Controls 
+                <Controls
+                    className='rounded-[4px] overflow-hidden [&_button]:!bg-[rgb(255,255,255)] [&_button]:!border-b-[rgb(235,235,235)] [&_button:last-child]:!border-b-0 [&_button_svg]:!fill-[rgb(111,111,111)] dark:[&_button]:!bg-[rgb(17,23,28)] dark:[&_button]:!border-b-[rgb(31,39,45)] dark:[&_button_svg]:!fill-[rgb(146,164,179)]'
                     showFitView={true}
                     showInteractive={false}
                     showZoom={true}
