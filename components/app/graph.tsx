@@ -15,7 +15,8 @@ import 'reactflow/dist/style.css'
 
 import { cn } from '@/lib/utils'
 
-import { CheckCircleIcon, GridDashIcon } from '@databricks/design-system'
+// import { CheckCircleIcon, GridDashIcon } from '@databricks/design-system'
+import { CheckCircle, Grid3X3 } from 'lucide-react'
 
 import { Separator } from '@/components/ui/separator'
 
@@ -32,7 +33,7 @@ interface StepNodeData {
 }
 
 function StepNode({ data }: { data: StepNodeData }) {
-    const Icon = data.icon ?? GridDashIcon
+    const Icon = data.icon ?? Grid3X3
 
     return (
         <div
@@ -44,9 +45,7 @@ function StepNode({ data }: { data: StepNodeData }) {
             <div className='items-center flex gap-2 p-2'>
                 <div aria-label='step-icon' className='bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1'>
                     <Icon
-                        className='rounded-[4px] p-0.5 [&>svg]:text-[rgb(111,111,111)] dark:[&>svg]:text-[rgb(146,164,179)]'
-                        onPointerEnterCapture={undefined}
-                        onPointerLeaveCapture={undefined}
+                        className='rounded-[4px] p-0.5 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] size-4'
                     />
                 </div>
                 <span aria-label='step-name' className='text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] text-sm font-semibold flex-1 truncate'>
@@ -54,10 +53,8 @@ function StepNode({ data }: { data: StepNodeData }) {
                 </span>
                 {data.status === 'success' && (
                     <div aria-label='step-status' className='flex h-6 items-center justify-center w-6'>
-                        <CheckCircleIcon
-                            className='[&>svg]:text-[rgb(39,124,67)] dark:[&>svg]:text-[rgb(59,166,94)]'
-                            onPointerEnterCapture={undefined}
-                            onPointerLeaveCapture={undefined}
+                        <CheckCircle
+                            className='text-[rgb(39,124,67)] dark:text-[rgb(59,166,94)] size-4'
                         />
                     </div>
                 )}

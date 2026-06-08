@@ -3,7 +3,8 @@
 import { useId, useState } from 'react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
-import { ChartLineIcon } from '@databricks/design-system'
+// import { ChartLineIcon } from '@databricks/design-system'
+import { LineChart } from 'lucide-react'
 
 import {
     ChartConfig,
@@ -106,10 +107,8 @@ export function ChartEmbed({ id, mode }: { id: string; mode?: ChartEmbedMode }) 
         <Preview onOpenChange={setOpen} open={open}>
             <PreviewTrigger open={open}>
                 <span className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1">
-                    <ChartLineIcon
-                        className="[&>svg]:text-[rgb(111,111,111)] dark:[&>svg]:text-[rgb(146,164,179)]"
-                        onPointerEnterCapture={() => {}}
-                        onPointerLeaveCapture={() => {}}
+                    <LineChart
+                        className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
                     />
                 </span>
                 <div className="items-center flex flex-1 gap-2 text-left">

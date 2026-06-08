@@ -2,7 +2,8 @@
 
 import { use, useState } from 'react'
 
-import { BugIcon, ChevronDoubleLeftIcon, CloseIcon, CopyIcon, ForkIcon, GearIcon, PlusIcon, ReplyIcon, ShareIcon, SyncIcon, ThumbsDownIcon, ThumbsUpIcon } from '@databricks/design-system'
+// import { BugIcon, ChevronDoubleLeftIcon, CloseIcon, CopyIcon, ForkIcon, GearIcon, PlusIcon, ReplyIcon, ShareIcon, SyncIcon, ThumbsDownIcon, ThumbsUpIcon } from '@databricks/design-system'
+import { Bug, ChevronsLeft, Copy, CornerUpLeft, GitFork, Plus, RefreshCw, Settings, Share2, ThumbsDown, ThumbsUp, X } from 'lucide-react'
 
 import { useRouter } from 'next/navigation'
 import { usePanelRef } from 'react-resizable-panels'
@@ -25,12 +26,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { MessageAction } from '@/data/messages'
 import { Thread } from '@/data/threads'
 
-const ACTION_ICONS: Record<NonNullable<MessageAction['icon']>, React.ComponentType<React.ComponentProps<typeof BugIcon>>> = {
-    thumbs_up: ThumbsUpIcon,
-    thumbs_down: ThumbsDownIcon,
-    regenerate: SyncIcon,
-    copy: CopyIcon,
-    copy_debug: BugIcon,
+const ACTION_ICONS: Record<NonNullable<MessageAction['icon']>, React.ComponentType<{ className?: string }>> = {
+    thumbs_up: ThumbsUp,
+    thumbs_down: ThumbsDown,
+    regenerate: RefreshCw,
+    copy: Copy,
+    copy_debug: Bug,
 }
 
 type ThreadStatus = NonNullable<Thread['status']>
@@ -143,7 +144,7 @@ function Page({ params }: PageProps) {
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <ChevronDoubleLeftIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
+                                    <ChevronsLeft className="size-4" />
                                 </Button>
 
                                 {/* Thread label */}
@@ -171,28 +172,28 @@ function Page({ params }: PageProps) {
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <PlusIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
+                                    <Plus className="size-4" />
                                 </Button>
                                 <Button
                                     className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <GearIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
+                                    <Settings className="size-4" />
                                 </Button>
                                 <Button
                                     className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <ShareIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
+                                    <Share2 className="size-4" />
                                 </Button>
                                 <Button
                                     className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <ForkIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4} />
+                                    <GitFork className="size-4" />
                                 </Button>
 
                                 {/* Optional */}
@@ -273,11 +274,8 @@ function Page({ params }: PageProps) {
                                                                             onClick={() => handleSubmit(suggestion.label)}
                                                                             variant="secondary"
                                                                         >
-                                                                            <ReplyIcon
-                                                                                className="[&_g_path]:[fill:url(#reply-icon-gradient)]"
-                                                                                onPointerEnterCapture={() => {}}
-                                                                                onPointerLeaveCapture={() => {}}
-                                                                                size={3.5}
+                                                                            <CornerUpLeft
+                                                                                className="size-3.5 [&_path]:[stroke:url(#reply-icon-gradient)]"
                                                                             />
                                                                             <span>{suggestion.label}</span>
                                                                         </Button>
@@ -304,7 +302,7 @@ function Page({ params }: PageProps) {
                                                                                                 size="icon-sm"
                                                                                                 variant="ghost"
                                                                                             >
-                                                                                                <Icon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} />
+                                                                                                <Icon className="size-4" />
                                                                                                 <span className="sr-only">{action.label}</span>
                                                                                             </Button>
                                                                                         }
@@ -398,7 +396,7 @@ function Page({ params }: PageProps) {
                                             size="icon"
                                             variant="ghost"
                                             >
-                                            <CloseIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} size={4}/>
+                                            <X className="size-4" />
                                         </Button>
                                     </div>
                                     {showIncidentPanel && thread && (

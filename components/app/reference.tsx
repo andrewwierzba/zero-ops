@@ -1,12 +1,13 @@
 import { cn } from '@/lib/utils'
 
-import { FileIcon, PipelineIcon, TableIcon, WorkflowsIcon } from '@databricks/design-system'
+// import { FileIcon, PipelineIcon, TableIcon, WorkflowsIcon } from '@databricks/design-system'
+import { File, GitBranch, Table, Workflow } from 'lucide-react'
 
 const Icons = {
-    file: FileIcon,
-    job: WorkflowsIcon,
-    pipeline: PipelineIcon,
-    table: TableIcon,
+    file: File,
+    job: Workflow,
+    pipeline: GitBranch,
+    table: Table,
 } as const
 
 export type AssetKind = keyof typeof Icons
@@ -28,9 +29,7 @@ export function Reference(props: ReferenceProps) {
     const body = (
         <>
             <Icon
-                className="[&>svg]:text-[rgb(82,82,82)] dark:[&>svg]:text-[rgb(146,164,179)] [&>svg]:size-3"
-                onPointerEnterCapture={() => {}}
-                onPointerLeaveCapture={() => {}}
+                className="text-[rgb(82,82,82)] dark:text-[rgb(146,164,179)] size-3"
             />
             <span className="min-w-0 truncate">{props.label}</span>
         </>

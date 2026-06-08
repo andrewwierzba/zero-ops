@@ -1,6 +1,7 @@
 'use client'
 
-import { DagIcon } from '@databricks/design-system'
+// import { DagIcon } from '@databricks/design-system'
+import { Network } from 'lucide-react'
 
 import { useState } from 'react'
 
@@ -41,10 +42,8 @@ export function GraphEmbed({ id, mode }: { id: string; mode?: GraphEmbedMode }) 
         >
             <PreviewTrigger open={open}>
                 <span className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1">
-                    <DagIcon
-                        className="[&>svg]:text-[rgb(111,111,111)] dark:[&>svg]:text-[rgb(146,164,179)]"
-                        onPointerEnterCapture={() => {}}
-                        onPointerLeaveCapture={() => {}}
+                    <Network
+                        className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
                     />
                 </span>
                 <div className="items-center flex flex-1 gap-2 text-left">

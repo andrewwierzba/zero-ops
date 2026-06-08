@@ -1,6 +1,7 @@
 'use client'
 
-import { PlusMinusSquareIcon } from '@databricks/design-system'
+// import { PlusMinusSquareIcon } from '@databricks/design-system'
+import { FileDiff } from 'lucide-react'
 
 import { useState } from 'react'
 
@@ -67,10 +68,8 @@ function SingleFilePreview({ file }: { file: CodeChangeFile }) {
         >
             <PreviewTrigger open={open}>
                 <span className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1">
-                    <PlusMinusSquareIcon
-                        className="[&>svg]:text-[rgb(111,111,111)] dark:[&>svg]:text-[rgb(146,164,179)]"
-                        onPointerEnterCapture={() => {}}
-                        onPointerLeaveCapture={() => {}}
+                    <FileDiff
+                        className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
                     />
                 </span>
                 <div className="items-center flex flex-1 gap-2 text-left">
@@ -170,10 +169,8 @@ export function CodeChange({ actions, files, onAction, style }: CodeChangeProps 
             <div className="items-center flex flex-1 gap-2 justify-between px-2 py-2 text-left">
                 <div className="items-center flex gap-2">
                     <span className="items-center bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex justify-center size-6">
-                        <PlusMinusSquareIcon
-                            className="[&>svg]:text-[rgb(111,111,111)] dark:[&>svg]:text-[rgb(146,164,179)]"
-                            onPointerEnterCapture={() => {}}
-                            onPointerLeaveCapture={() => {}}
+                        <FileDiff
+                            className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
                         />
                     </span>
                     <span>{headerLabel}</span>

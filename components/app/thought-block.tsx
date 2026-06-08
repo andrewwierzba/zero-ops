@@ -1,6 +1,7 @@
 'use client'
 
-import { ChevronDownIcon } from '@databricks/design-system'
+// import { ChevronDownIcon } from '@databricks/design-system'
+import { ChevronDown } from 'lucide-react'
 
 import { useState } from 'react'
 
@@ -27,10 +28,8 @@ function ThoughtStepRow({ codeChanges, step }: { codeChanges: CodeChangeMap; ste
         <Collapsible onOpenChange={setOpen} open={open}>
             <CollapsibleTrigger className="items-center text-muted-foreground hover:text-foreground flex gap-1.5 text-xs text-left transition-colors">
                 <span>{step.summary}</span>
-                <ChevronDownIcon
+                <ChevronDown
                     className={`${open ? '' : '-rotate-90'} shrink-0 size-3 transition-transform`}
-                    onPointerEnterCapture={() => {}}
-                    onPointerLeaveCapture={() => {}}
                 />
             </CollapsibleTrigger>
             {step.content && (
@@ -55,10 +54,8 @@ export function ThoughtBlock({ codeChanges, defaultOpen, duration_ms, steps, sum
         <Collapsible onOpenChange={setOpen} open={open}>
             <CollapsibleTrigger className="items-center text-muted-foreground hover:text-foreground flex gap-1.5 text-xs text-left transition-colors">
                 <span>{formatWorkedDuration(duration_ms)}</span>
-                <ChevronDownIcon
+                <ChevronDown
                     className={`${open ? '' : '-rotate-90'} shrink-0 size-3 transition-transform`}
-                    onPointerEnterCapture={() => {}}
-                    onPointerLeaveCapture={() => {}}
                 />
             </CollapsibleTrigger>
             <CollapsibleContent>

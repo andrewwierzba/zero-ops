@@ -1,6 +1,7 @@
 'use client'
 
-import { AppIcon, ChevronDownIcon, SearchIcon } from '@databricks/design-system'
+// import { AppIcon, ChevronDownIcon, SearchIcon } from '@databricks/design-system'
+import { ChevronDown, LayoutGrid, Search } from 'lucide-react'
 
 import Image from 'next/image'
 import { createContext, useContext, useState } from 'react'
@@ -86,10 +87,8 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
                     <InputGroup className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)] rounded-[4px] flex-1 justify-self-center max-w-140">
                         <InputGroupAddon align="inline-start">
                             <InputGroupText>
-                                <SearchIcon
-                                    className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
-                                    onPointerEnterCapture={() => {}}
-                                    onPointerLeaveCapture={() => {}}
+                                <Search
+                                    className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
                                 />
                             </InputGroupText>
                         </InputGroupAddon>
@@ -111,7 +110,7 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
                         variant="ghost"
                     >
                         <span className="text-[13px] truncate">Workspace (eu-west-2)</span>
-                        <ChevronDownIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} />
+                        <ChevronDown className="size-4" />
                     </Button>
                     <Button
                         aria-label="Open Genie Code"
@@ -128,7 +127,7 @@ function ApplicationShell({ children }: { children: React.ReactNode }) {
                         size="icon"
                         variant="ghost"
                     >
-                        <AppIcon onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}} />
+                        <LayoutGrid className="size-4" />
                     </Button>
                     <Button
                         aria-label="Open profile"

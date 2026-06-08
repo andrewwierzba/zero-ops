@@ -4,29 +4,30 @@ import { cn } from '@/lib/utils'
 
 import { CompassIcon } from 'lucide-react'
 
-import { BeakerIcon, ChecklistIcon, ClockIcon, CloudDatabaseIcon, CloudIcon, CloudModelIcon, DashboardIcon, DataIcon, DatabaseIcon, HistoryIcon, IngestionIcon, LayerIcon, ModelsIcon, NotebookIcon, NotificationIcon, PlusIcon, QueryEditorIcon, QueryIcon, SparkleDoubleIcon, SparkleRectangleIcon, StorefrontIcon, UserSparkleIcon, WorkflowsIcon } from '@databricks/design-system'
+// import { BeakerIcon, ChecklistIcon, ClockIcon, CloudDatabaseIcon, CloudIcon, CloudModelIcon, DashboardIcon, DataIcon, DatabaseIcon, HistoryIcon, IngestionIcon, LayerIcon, ModelsIcon, NotebookIcon, NotificationIcon, PlusIcon, QueryEditorIcon, QueryIcon, SparkleDoubleIcon, SparkleRectangleIcon, StorefrontIcon, UserSparkleIcon, WorkflowsIcon } from '@databricks/design-system'
+import { ArrowDownToLine, Bell, BookOpen, Box, ClipboardList, Clock, Cloud, CloudCog, Database, DatabaseZap, FileCode, FlaskConical, History, Layers, LayoutDashboard, Plus, Search, Sparkles, Store, UserRoundCog, Workflow } from 'lucide-react'
 
 export function Sidebar({
     groups = [{
         items: [{
             href: '/browse',
-            icon: NotebookIcon,
+            icon: BookOpen,
             label: 'Workspace'
          }, {
             href: '/recents',
-            icon: ClockIcon,
+            icon: Clock,
             label: 'Recents'
          }, {
             href: '/explore/data',
-            icon: DataIcon,
+            icon: Database,
             label: 'Catalog'
          }, {
             href: '/jobs',
-            icon: WorkflowsIcon,
+            icon: Workflow,
             label: 'Jobs & Pipelines'
          }, {
             href: '/compute/interactive',
-            icon: CloudIcon,
+            icon: Cloud,
             label: 'Compute'
          }, {
             href: '/search/discover',
@@ -35,81 +36,81 @@ export function Sidebar({
             tag: 'Beta'
          }, {
             href: '/marketplace',
-            icon: StorefrontIcon,
+            icon: Store,
             label: 'Marketplace'
          }]
     }, {
         label: 'SQL',
         items: [{
             href: '/editor/queries',
-            icon: QueryEditorIcon,
+            icon: FileCode,
             label: 'SQL Editor'
          }, {
             href: '/sql/queries',
-            icon: QueryIcon,
+            icon: Search,
             label: 'Queries'
          }, {
             href: '/sql/dashboards',
-            icon: DashboardIcon,
+            icon: LayoutDashboard,
             label: 'Dashboards'
          }, {
             href: '/genie',
-            icon: SparkleRectangleIcon,
+            icon: Sparkles,
             label: 'Genie'
          }, {
             href: '/sql/alerts',
-            icon: NotificationIcon,
+            icon: Bell,
             label: 'Alerts'
          }, {
             href: '/sql/history',
-            icon: HistoryIcon,
+            icon: History,
             label: 'Query History'
          }, {
             href: '/compute/sql-warehouses',
-            icon: CloudDatabaseIcon,
+            icon: DatabaseZap,
             label: 'SQL Warehouses'
          }]
     }, {
         label: 'Data Engineering',
         items: [{
             href: '/jobs/runs',
-            icon: ChecklistIcon,
+            icon: ClipboardList,
             label: 'Runs'
          }, {
             href: '/ingestion/add',
-            icon: IngestionIcon,
+            icon: ArrowDownToLine,
             label: 'Data Ingestion'
          }]
     }, {
         label: 'AI/ML',
         items: [{
             href: '/ml/playground',
-            icon: SparkleDoubleIcon,
+            icon: Sparkles,
             label: 'Playground'
          }, {
             href: '/ml/bricks',
-            icon: UserSparkleIcon,
+            icon: UserRoundCog,
             label: 'Agents'
          }, {
             className: 'rotate-270',
             href: '/ml/ai-gateway',
-            icon: IngestionIcon,
+            icon: ArrowDownToLine,
             label: 'AI Gateway'
          }, {
             href: '/ml/experiments',
-            icon: BeakerIcon,
+            icon: FlaskConical,
             label: 'Experiments'
          }, {
             href: '/feature-store',
-            icon: LayerIcon,
+            icon: Layers,
             label: 'Features'
          }, {
             href: '/ml/models',
-            icon: ModelsIcon,
+            icon: Box,
             label: 'Models'
          }, {
             href: '/ml/endpoints',
-            icon: CloudModelIcon,
+            icon: CloudCog,
             label: 'Serving'
          }]
     }]
@@ -129,10 +130,8 @@ export function Sidebar({
       <div className="flex flex-col group min-h-0 min-w-50 self-stretch">
          <div aria-label="Sidebar" className="items-center flex flex-1 flex-col text-[13px] min-h-0 overflow-y-auto pl-3 pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-200 dark:group-hover:[&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
             <span className="items-center bg-[rgb(255,73,73)]/8 border border-[rgb(255,73,73)]/8 rounded-md flex font-semibold gap-2 h-10 mb-2 px-3 py-1.5 shrink-0 w-full">
-                  <PlusIcon
+                  <Plus
                      className="text-[rgb(255,73,73)]! size-4"
-                     onPointerEnterCapture={() => {}}
-                     onPointerLeaveCapture={() => {}}
                   />
                   <span>New</span>
             </span>
