@@ -7,6 +7,7 @@ import { CodeBlock } from '@/components/app/code-block'
 import { CodeChange } from '@/components/app/code-change'
 import { GraphEmbed, GraphEmbedMode } from '@/components/app/graph-embed'
 import { AssetKind, Reference } from '@/components/app/reference'
+import { TableEmbed, TableEmbedMode } from '@/components/app/table-embed'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
@@ -16,8 +17,9 @@ type CodeChangeMap = Record<string, CodeChangeData> | undefined
 
 const INLINE_REGEX = /\[\[(file|job|pipeline|table|column):([^\]]+)\]\]|\*\*([^*\n][^*]*?)\*\*|`([^`\n]+)`|\[([^\]]+)\]\(([^)]+)\)/g
 const HEADING_REGEX = /^(#{1,6}) +(.+)$/gm
-const EMBED_REGEX = /\[\[embed:(graph|chart|code_change)\|([^|\]]+)(?:\|(collapsed|expanded))?\]\]/g
-const LIST_BLOCK_REGEX = /(^|\n)((?:- [^\n]+(?:\n|$))+)/g
+const EMBED_REGEX = /\[\[embed:(graph|chart|table|code_change)\|([^|\]]+)(?:\|(collapsed|expanded))?\]\]/g
+const UNORDERED_LIST_REGEX = /(^|\n)((?:- [^\n]+(?:\n|$))+)/g
+const ORDERED_LIST_REGEX = /(^|\n)((?:\d+\. [^\n]+(?:\n|$))+)/g
 
 function parseMarkdownTable(tableText: string, key: number) {
     const lines = tableText.trim().split('\n')
@@ -30,24 +32,26 @@ function parseMarkdownTable(tableText: string, key: number) {
     const dataRows = lines.slice(2).map(parseRow)
 
     return (
-        <Table key={key}>
-            <TableHeader>
-                <TableRow>
-                    {headers.map((header, i) => (
-                        <TableHead key={i}>{header}</TableHead>
-                    ))}
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {dataRows.map((row, rowIndex) => (
-                    <TableRow key={rowIndex}>
-                        {row.map((cell, cellIndex) => (
-                            <TableCell key={cellIndex}>{cell}</TableCell>
+        <div className="border rounded-md overflow-hidden" key={key}>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        {headers.map((header, i) => (
+                            <TableHead key={i}>{header}</TableHead>
                         ))}
                     </TableRow>
-                ))}
-            </TableBody>
-        </Table>
+                </TableHeader>
+                <TableBody>
+                    {dataRows.map((row, rowIndex) => (
+                        <TableRow key={rowIndex}>
+                            {row.map((cell, cellIndex) => (
+                                <TableCell key={cellIndex}>{cell}</TableCell>
+                            ))}
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
     )
 }
 
@@ -90,13 +94,42 @@ function renderInlineTags(text: string, baseKey: number): React.ReactNode[] {
 
 function renderParagraphsAndLists(text: string, baseKey: number): React.ReactNode[] {
     const out: React.ReactNode[] = []
-    let cursor = 0
+
+    // Find all list matches with their positions and types
+    const listMatches: Array<{ index: number; length: number; content: string; type: 'ul' | 'ol'; prefix: string }> = []
+
+    UNORDERED_LIST_REGEX.lastIndex = 0
     let match: RegExpExecArray | null
-    LIST_BLOCK_REGEX.lastIndex = 0
-    while ((match = LIST_BLOCK_REGEX.exec(text)) !== null) {
-        const listStart = match.index + match[1].length
-        if (listStart > cursor) {
-            const before = text.slice(cursor, listStart).trim()
+    while ((match = UNORDERED_LIST_REGEX.exec(text)) !== null) {
+        listMatches.push({
+            index: match.index + match[1].length,
+            length: match[2].length,
+            content: match[2],
+            type: 'ul',
+            prefix: match[1],
+        })
+    }
+
+    ORDERED_LIST_REGEX.lastIndex = 0
+    while ((match = ORDERED_LIST_REGEX.exec(text)) !== null) {
+        listMatches.push({
+            index: match.index + match[1].length,
+            length: match[2].length,
+            content: match[2],
+            type: 'ol',
+            prefix: match[1],
+        })
+    }
+
+    // Sort by position
+    listMatches.sort((a, b) => a.index - b.index)
+
+    let cursor = 0
+    for (const listMatch of listMatches) {
+        if (listMatch.index < cursor) continue // Skip overlapping matches
+
+        if (listMatch.index > cursor) {
+            const before = text.slice(cursor, listMatch.index).trim()
             if (before) {
                 out.push(
                     <p className="whitespace-pre-wrap" key={baseKey + cursor}>
@@ -105,16 +138,37 @@ function renderParagraphsAndLists(text: string, baseKey: number): React.ReactNod
                 )
             }
         }
-        const items = match[2].trim().split('\n').map((line) => line.slice(2))
-        out.push(
-            <ul className="list-disc list-outside flex flex-col gap-1 pl-5" key={`list-${baseKey + listStart}`}>
-                {items.map((item, i) => (
-                    <li key={i}>{renderInlineTags(item, baseKey + listStart + i)}</li>
-                ))}
-            </ul>
-        )
-        cursor = match.index + match[0].length
+
+        const lines = listMatch.content.trim().split('\n')
+        const items = lines.map((line) => {
+            if (listMatch.type === 'ul') {
+                return line.slice(2) // Remove "- "
+            } else {
+                return line.replace(/^\d+\.\s*/, '') // Remove "1. ", "2. ", etc.
+            }
+        })
+
+        if (listMatch.type === 'ul') {
+            out.push(
+                <ul className="list-disc list-outside flex flex-col gap-1 pl-5" key={`list-${baseKey + listMatch.index}`}>
+                    {items.map((item, i) => (
+                        <li key={i}>{renderInlineTags(item, baseKey + listMatch.index + i)}</li>
+                    ))}
+                </ul>
+            )
+        } else {
+            out.push(
+                <ol className="list-decimal list-outside flex flex-col gap-1 pl-5" key={`list-${baseKey + listMatch.index}`}>
+                    {items.map((item, i) => (
+                        <li key={i}>{renderInlineTags(item, baseKey + listMatch.index + i)}</li>
+                    ))}
+                </ol>
+            )
+        }
+
+        cursor = listMatch.index + listMatch.length
     }
+
     if (cursor < text.length) {
         const remaining = text.slice(cursor).trim()
         if (remaining) {
@@ -211,6 +265,8 @@ function renderTextSegment(
             out.push(<ChartEmbed id={id} key={key} mode={mode as ChartEmbedMode | undefined} />)
         } else if (kind === 'graph') {
             out.push(<GraphEmbed id={id} key={key} mode={mode as GraphEmbedMode | undefined} />)
+        } else if (kind === 'table') {
+            out.push(<TableEmbed id={id} key={key} mode={mode as TableEmbedMode | undefined} />)
         } else if (kind === 'code_change') {
             const change = codeChanges?.[id]
             if (change) {

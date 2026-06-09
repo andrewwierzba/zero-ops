@@ -64,6 +64,215 @@ const defaultAgentActions: MessageAction[] = [
 
 export const defaultMessages: ThreadMessages[] = [
     {
+        threadId: '11111111-0000-0000-0000-000000000012',
+        messages: [
+            {
+                actions: defaultAgentActions,
+                code_changes: {
+                    default: {
+                        actions: [
+                            { label: 'Review', variant: 'secondary' },
+                            {
+                                icon: GitPullRequestIcon,
+                                label: 'Create pull request',
+                                variant: 'primary',
+                            },
+                        ],
+                        files: [
+                            {
+                                code: `# pipelines/fan_interaction_enrichment.py
+- # Monolithic stream: ingest → identity → enrich → sink
+- fan_events = (spark.readStream.format("zerobus")
+-     .option("topic", "fan-interactions")
+-     .load())
+-
+- # Identity resolution inline
+- resolved = fan_events.join(fan_identity_map, "device_id")
+-
+- # Profile enrichment inline
+- enriched = resolved.join(fan_profiles, "fan_id")
+-
+- # Single stateful write
+- enriched.writeStream.format("lakebase")
+-     .option("collection", "active_fans")
+-     .start()
++ # Stage 1: Normalized event ingestion
++ from pipelines.fan_identity_resolution import resolve_fan_identity
++ from pipelines.fan_profile_enrichment import enrich_fan_profile
++ from sinks.lakebase_fan_activity_writer import write_to_lakebase
++
++ fan_events = (spark.readStream.format("zerobus")
++     .option("topic", "fan-interactions")
++     .load())
++
++ # Stage 2: Bounded identity resolution
++ resolved = resolve_fan_identity(fan_events)
++
++ # Stage 3: Profile enrichment with snapshot
++ enriched = enrich_fan_profile(resolved)
++
++ # Stage 4: Idempotent Lakebase sink
++ write_to_lakebase(enriched)`,
+                                filename: 'pipelines/fan_interaction_enrichment.py',
+                                language: 'diff',
+                            },
+                            {
+                                code: `# pipelines/fan_identity_resolution.py (new file)
++ from pyspark.sql import DataFrame
++ from pyspark.sql.functions import col, expr, window
++
++ def resolve_fan_identity(events: DataFrame) -> DataFrame:
++     """
++     Bounded identity resolution with strict watermarking.
++     Resolves anonymous device_ids to fan_ids within 60s windows.
++     """
++     fan_identity_map = spark.table("fan_identity_map").cache()
++
++     return (events
++         .withWatermark("event_time", "60 seconds")
++         .join(
++             fan_identity_map,
++             on="device_id",
++             how="left"
++         )
++         .withColumn("fan_id",
++             expr("COALESCE(fan_id, CONCAT('anon_', device_id))"))
++         .withColumn("identity_resolved_at", expr("current_timestamp()"))
++     )`,
+                                filename: 'pipelines/fan_identity_resolution.py',
+                                language: 'diff',
+                            },
+                            {
+                                code: `# pipelines/fan_profile_enrichment.py (new file)
++ from pyspark.sql import DataFrame
++ from pyspark.sql.functions import broadcast
++
++ # Compact profile snapshot refreshed every 5 minutes
++ _profile_snapshot = None
++ _snapshot_time = None
++
++ def _get_profile_snapshot():
++     global _profile_snapshot, _snapshot_time
++     if _profile_snapshot is None or _needs_refresh():
++         _profile_snapshot = (spark.table("fan_profiles")
++             .select("fan_id", "section", "seat", "region", "loyalty_tier")
++             .cache())
++         _snapshot_time = datetime.now()
++     return _profile_snapshot
++
++ def enrich_fan_profile(events: DataFrame) -> DataFrame:
++     """
++     Profile enrichment using broadcast join against compact snapshot.
++     Adds section, seat, region, and loyalty_tier to resolved events.
++     """
++     profiles = broadcast(_get_profile_snapshot())
++
++     return events.join(profiles, on="fan_id", how="left")`,
+                                filename: 'pipelines/fan_profile_enrichment.py',
+                                language: 'diff',
+                            },
+                            {
+                                code: `# sinks/lakebase_fan_activity_writer.py (new file)
++ from pyspark.sql import DataFrame
++ from pyspark.sql.functions import col, sha2, concat_ws
++
++ def write_to_lakebase(enriched: DataFrame) -> None:
++     """
++     Idempotent Lakebase sink with deterministic event keys.
++     Uses pre-sorted micro-batches to minimize write amplification.
++     """
++     keyed = enriched.withColumn(
++         "event_key",
++         sha2(concat_ws(":", col("fan_id"), col("event_time")), 256)
++     )
++
++     (keyed
++         .repartition(32, "region")  # Parallel partition writes
++         .sortWithinPartitions("event_key")  # Deterministic ordering
++         .writeStream
++         .format("lakebase")
++         .option("collection", "active_fans")
++         .option("upsertKey", "event_key")
++         .option("idempotent", "true")
++         .outputMode("update")
++         .start())`,
+                                filename: 'sinks/lakebase_fan_activity_writer.py',
+                                language: 'diff',
+                            },
+                        ],
+                        style: 'group',
+                    },
+                },
+                content: `# Fan interaction enrichment falling behind real-time demand
+
+Several jobs and pipelines appeared as separate failures, but they share the same underlying cause: the fan interaction enrichment path is falling behind during high-volume match windows.
+
+## Impact
+
+- [[job:fan_profile_enrichment|#]] — freshness SLA breached
+- [[job:fan_interaction_enrichment|#]] — processing latency increasing
+- [[job:stadium_visualization_sink|#]] — Lakebase write retries
+- + 2 other downstream assets affected
+
+[[embed:graph|fan-enrichment-impact|collapsed]]
+
+## Root cause
+
+The current Spark Declarative Pipeline combines too many real-time responsibilities in a single streaming workflow: reading raw fan interaction events from ZeroBus, resolving fan identity, joining profile attributes (section, seat, region, loyalty tier), maintaining state for late-arriving and anonymous events, and writing enriched records to Lakebase.
+
+During high-volume match windows the enrichment step creates high-cardinality state. As fan interactions spike, the pipeline spends more time reconciling identity and profile context before writing to Lakebase. Once the stream falls behind, Lakebase write retries compound end-to-end latency.
+
+[[embed:table|fan-enrichment-metrics|collapsed]]
+
+[[embed:chart|fan-enrichment-latency|collapsed]]
+
+## Proposed fix
+
+Split the monolithic stream into 4 staged streaming components:
+
+1. **ZeroBus ingestion stream** — Read fan interaction events and normalize the event schema before enrichment.
+2. **Identity resolution stream** — Resolve anonymous and authenticated fan identifiers with bounded state and stricter watermarking.
+3. **Fan profile enrichment stream** — Join resolved fan events against a compact profile snapshot optimized for low-latency lookups.
+4. **Lakebase sink writer** — Write enriched records with deterministic event keys and idempotent upserts.
+
+[[embed:code_change|default]]`,
+                created_at: '2026-04-20T14:45:00+00:00',
+                id: 'msg-0012-01',
+                role: 'agent',
+                suggestions: [
+                    { label: 'Show sandbox validation results' },
+                    { label: 'Create pull request' },
+                ],
+                thought: {
+                    duration_ms: 142000,
+                    summary: 'I grouped 5 related pipeline signals into a single incident, identified the monolithic pipeline architecture as the root cause, and prepared a staged streaming refactor validated in sandbox.',
+                    steps: [
+                        {
+                            summary: 'Grouped related pipeline signals',
+                            content: `Multiple jobs appeared as separate failures but share the same underlying cause. Correlated signals from fan_interaction_enrichment (processing latency), stadium_visualization_sink (Lakebase write retries), fan_profile_enrichment (freshness SLA breached), mobile_push_personalization (null feature values), and seat_upgrade_recommendations (upstream dependency unavailable).`,
+                        },
+                        {
+                            summary: 'Identified root cause: monolithic pipeline architecture',
+                            content: `The current Spark Declarative Pipeline combines too many responsibilities in a single streaming workflow. During high-volume match windows, the enrichment step creates high-cardinality state causing the pipeline to fall behind. Once the stream falls behind, Lakebase write retries increase, compounding end-to-end latency.`,
+                        },
+                        {
+                            summary: 'Captured high-traffic window metrics',
+                            content: `End-to-end enrichment latency: 7m 48s peak (target <60s). Lakebase write retry rate: 11.6% peak (target <1%). Stadium visualization freshness: 6-8 min stale (target <60s). Downstream feature completeness: 93.4% during spike (target >99%).`,
+                        },
+                        {
+                            summary: 'Designed staged streaming refactor',
+                            content: `Proposed splitting the monolithic stream into 4 stages: (1) ZeroBus ingestion for event normalization, (2) Identity resolution with bounded state and stricter watermarking, (3) Fan profile enrichment with compact profile snapshot for low-latency lookups, (4) Lakebase sink with deterministic event keys and idempotent upserts.`,
+                        },
+                        {
+                            summary: 'Prepared code changes across 6 files',
+                            content: `Modified pipelines/fan_interaction_enrichment.py (split monolithic stream), created pipelines/fan_identity_resolution.py (bounded identity resolution), pipelines/fan_profile_enrichment.py (profile snapshot lookups), sinks/lakebase_fan_activity_writer.py (idempotent upserts), schemas/fan_interaction_events.py (deterministic event keys), tests/replay/test_fan_activity_peak_window.py (high-volume replay test).`,
+                        },
+                    ],
+                },
+            },
+        ],
+    },
+    {
         threadId: '11111111-0000-0000-0000-000000000011',
         messages: [
             {

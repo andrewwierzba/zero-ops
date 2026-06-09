@@ -30,6 +30,38 @@ export interface GraphDef {
 }
 
 export const graphs: Record<string, GraphDef> = {
+    'fan-enrichment-impact': {
+        title: 'Impact',
+        nodes: [
+            {
+                id: '0',
+                label: 'fan_profile_enrichment',
+                position: { x: 50, y: 50 },
+                content: { label: 'Upstream', value: 'Freshness SLA breached' },
+                showTarget: false,
+                taskType: 'pipeline',
+            },
+            {
+                id: '1',
+                label: 'fan_interaction_enrichment',
+                position: { x: 340, y: 50 },
+                content: { label: 'Primary', value: 'Processing latency increasing' },
+                taskType: 'python-script',
+            },
+            {
+                id: '2',
+                label: 'stadium_visualization_sink',
+                position: { x: 630, y: 50 },
+                content: { label: 'Downstream', value: 'Lakebase write retries' },
+                showSource: false,
+                taskType: 'python-script',
+            },
+        ],
+        edges: [
+            { id: 'e0-1', source: '0', target: '1' },
+            { id: 'e1-2', source: '1', target: '2' },
+        ],
+    },
     'claims-policyholder-schema': {
         title: 'Lineage',
         nodes: [

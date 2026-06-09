@@ -17,6 +17,68 @@ export interface Thread {
 
 export const defaultThreads: Thread[] = [
     {
+        id: '11111111-0000-0000-0000-000000000012',
+        label: 'Fan interaction enrichment falling behind real-time demand',
+        created_at: '2026-04-20T14:45:00+00:00',
+        severity: 'critical',
+        status: 'investigating',
+        type: 'incident',
+        impact_assets: ['fan_interaction_enrichment', 'stadium_visualization_sink', 'fan_profile_enrichment', 'mobile_push_personalization', 'seat_upgrade_recommendations'],
+        progress_updates: [
+            {
+                description: 'Grouped 5 related pipeline signals into single incident',
+                detail: 'Multiple jobs appeared as separate failures but share the same underlying cause: fan_interaction_enrichment (processing latency), stadium_visualization_sink (Lakebase write retries), fan_profile_enrichment (freshness SLA breached), mobile_push_personalization (null feature values), seat_upgrade_recommendations (upstream dependency unavailable).',
+                status: 'completed',
+                timestamp: '2026-04-20T14:45:00+00:00',
+            },
+            {
+                description: 'Root cause identified: monolithic pipeline architecture',
+                detail: 'Current Spark Declarative Pipeline combines too many real-time responsibilities in a single streaming workflow: reading raw events from ZeroBus, resolving fan identity, joining profile attributes (section, seat, region, loyalty tier), maintaining state for late-arriving events, and writing to Lakebase. During high-volume match windows, enrichment creates high-cardinality state causing the pipeline to fall behind.',
+                status: 'completed',
+                timestamp: '2026-04-20T14:52:00+00:00',
+            },
+            {
+                description: 'High-traffic window metrics captured',
+                detail: 'End-to-end enrichment latency: 7m 48s peak (target <60s). Lakebase write retry rate: 11.6% peak (target <1%). Stadium visualization freshness: 6-8 min stale (target <60s). Downstream feature completeness: 93.4% during spike (target >99%).',
+                status: 'completed',
+                timestamp: '2026-04-20T14:58:00+00:00',
+            },
+            {
+                description: 'Staged streaming refactor proposed',
+                detail: 'Split monolithic stream into 4 stages: (1) ZeroBus ingestion stream for event normalization, (2) Identity resolution stream with bounded state and stricter watermarking, (3) Fan profile enrichment stream with compact profile snapshot for low-latency lookups, (4) Lakebase sink writer with deterministic event keys and idempotent upserts.',
+                status: 'completed',
+                timestamp: '2026-04-20T15:04:00+00:00',
+            },
+            {
+                description: 'Code changes prepared across 6 files',
+                detail: 'pipelines/fan_interaction_enrichment.py (split monolithic stream), pipelines/fan_identity_resolution.py (bounded identity resolution), pipelines/fan_profile_enrichment.py (profile snapshot lookups), sinks/lakebase_fan_activity_writer.py (idempotent upserts), schemas/fan_interaction_events.py (deterministic event keys), tests/replay/test_fan_activity_peak_window.py (high-volume replay test).',
+                status: 'completed',
+                timestamp: '2026-04-20T15:10:00+00:00',
+            },
+            {
+                description: 'Sandbox validation passed',
+                detail: 'Replayed 60-minute high-volume event window. All checks passed: output row count parity, fan identity match rate, seat/section/loyalty enrichment accuracy, late-arriving event handling, Lakebase idempotent write behavior, stadium visualization read model compatibility.',
+                status: 'completed',
+                timestamp: '2026-04-20T15:18:00+00:00',
+            },
+            {
+                description: 'Benchmark results confirm fix',
+                detail: 'Peak enrichment latency: 7m 48s → 43s. Lakebase write retry rate: 11.6% → 0.4%. State store size: -68%. Downstream feature completeness: 93.4% → 99.8%. Output correctness: 100% parity with current pipeline.',
+                status: 'current',
+                timestamp: '2026-04-20T15:24:00+00:00',
+            },
+            {
+                description: 'Shadow deployment recommended',
+                detail: 'Deploy staged pipeline in shadow mode for next high-traffic match window. Compare enrichment latency, Lakebase retry rate, output parity, stadium visualization freshness, and downstream feature completeness against production pipeline before switching traffic.',
+                status: 'pending',
+                timestamp: '2026-04-20T15:30:00+00:00',
+            },
+        ],
+        reported_by: 'Genie ZeroOps',
+        root_cause_summary: 'The current Spark Declarative Pipeline combines too many real-time responsibilities in a single streaming workflow: reading raw fan interaction events from ZeroBus, resolving fan identity, joining profile attributes, maintaining state for late-arriving events, and writing to Lakebase. During high-volume match windows the enrichment step creates high-cardinality state, causing the pipeline to fall behind. Once the stream falls behind, Lakebase write retries compound end-to-end latency. The pipeline appears partially healthy at the job level but fails the real-time product requirement.',
+        updated_at: '2026-04-20T15:24:00+00:00',
+    },
+    {
         id: '11111111-0000-0000-0000-000000000011',
         label: 'etl_orders_nightly failing with shuffle FetchFailedException retries',
         created_at: '2026-04-20T10:10:00+00:00',
