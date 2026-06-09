@@ -1,7 +1,6 @@
 'use client'
 
-// import { OverflowIcon, SearchIcon } from '@databricks/design-system'
-import { MoreHorizontal, Search } from 'lucide-react'
+import { OverflowIcon, SearchIcon } from '@/lib/icons'
 import { InboxIcon, SquarePenIcon } from 'lucide-react'
 
 import { usePathname, useRouter } from 'next/navigation'
@@ -71,7 +70,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                             size="icon"
                             variant="ghost"
                         >
-                            <MoreHorizontal
+                            <OverflowIcon
                                 className="size-4"
                             />
                         </Button>
@@ -95,7 +94,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                             className="text-[13px] font-normal gap-2 justify-start"
                             variant="ghost"
                         >
-                            <Search
+                            <SearchIcon
                                 className="size-4"
                             />
                             Search

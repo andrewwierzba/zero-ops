@@ -2,8 +2,7 @@
 
 import { use, useState } from 'react'
 
-// import { BugIcon, ChevronDoubleLeftIcon, CloseIcon, CopyIcon, ForkIcon, GearIcon, PlusIcon, ReplyIcon, ShareIcon, SyncIcon, ThumbsDownIcon, ThumbsUpIcon } from '@databricks/design-system'
-import { Bug, ChevronsLeft, Copy, CornerUpLeft, GitFork, Plus, RefreshCw, Settings, Share2, ThumbsDown, ThumbsUp, X } from 'lucide-react'
+import { BugIcon, ChevronDoubleLeftIcon, CloseIcon, CopyIcon, ForkIcon, GearIcon, PlusIcon, ReplyIcon, ShareIcon, SyncIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
 
 import { useRouter } from 'next/navigation'
 import { usePanelRef } from 'react-resizable-panels'
@@ -26,12 +25,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { MessageAction } from '@/data/messages'
 import { Thread } from '@/data/threads'
 
-const ACTION_ICONS: Record<NonNullable<MessageAction['icon']>, React.ComponentType<{ className?: string }>> = {
-    thumbs_up: ThumbsUp,
-    thumbs_down: ThumbsDown,
-    regenerate: RefreshCw,
-    copy: Copy,
-    copy_debug: Bug,
+const ACTION_ICONS: Record<NonNullable<MessageAction['icon']>, React.ComponentType<any>> = {
+    thumbs_up: ThumbsUpIcon,
+    thumbs_down: ThumbsDownIcon,
+    regenerate: SyncIcon,
+    copy: CopyIcon,
+    copy_debug: BugIcon,
 }
 
 type ThreadStatus = NonNullable<Thread['status']>
@@ -144,7 +143,7 @@ function Page({ params }: PageProps) {
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <ChevronsLeft className="size-4" />
+                                    <ChevronDoubleLeftIcon className="size-4" />
                                 </Button>
 
                                 {/* Thread label */}
@@ -172,28 +171,28 @@ function Page({ params }: PageProps) {
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <Plus className="size-4" />
+                                    <PlusIcon className="size-4" />
                                 </Button>
                                 <Button
                                     className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <Settings className="size-4" />
+                                    <GearIcon className="size-4" />
                                 </Button>
                                 <Button
                                     className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <Share2 className="size-4" />
+                                    <ShareIcon className="size-4" />
                                 </Button>
                                 <Button
                                     className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <GitFork className="size-4" />
+                                    <ForkIcon className="size-4" />
                                 </Button>
 
                                 {/* Optional */}
@@ -210,7 +209,7 @@ function Page({ params }: PageProps) {
                         <div className="flex-1 min-h-0 overflow-y-auto ">
                             <div className="flex flex-col min-h-full">
                                 <div
-                                    className={`flex-1 text-[13px] p-6 ${
+                                    className={`flex-1 text-[13px] leading-[20px] p-6 ${
                                         threadMessages.length === 0 && !threadThinking
                                             ? 'flex items-center justify-center'
                                             : ''
@@ -274,7 +273,7 @@ function Page({ params }: PageProps) {
                                                                             onClick={() => handleSubmit(suggestion.label)}
                                                                             variant="secondary"
                                                                         >
-                                                                            <CornerUpLeft
+                                                                            <ReplyIcon
                                                                                 className="size-3.5 [&_path]:[stroke:url(#reply-icon-gradient)]"
                                                                             />
                                                                             <span>{suggestion.label}</span>
@@ -396,7 +395,7 @@ function Page({ params }: PageProps) {
                                             size="icon"
                                             variant="ghost"
                                             >
-                                            <X className="size-4" />
+                                            <CloseIcon className="size-4" />
                                         </Button>
                                     </div>
                                     {showIncidentPanel && thread && (

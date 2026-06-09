@@ -205,26 +205,19 @@ export const defaultMessages: ThreadMessages[] = [
                 },
                 content: `# Fan interaction enrichment falling behind real-time demand
 
-Several jobs and pipelines appeared as separate failures, but they share the same underlying cause: the fan interaction enrichment path is falling behind during high-volume match windows.
+The fan interaction enrichment pipeline is falling behind during peak match windows. The root cause is a monolithic Spark Streaming workflow that combines identity resolution, profile enrichment, and stateful writes in a single job. During traffic spikes, high-cardinality state accumulates faster than it can be flushed to Lakebase, and write retries compound end-to-end latency.
+
+[[embed:table|fan-enrichment-metrics|collapsed]]
+
+[[embed:chart|fan-enrichment-latency|collapsed]]
 
 ## Impact
 
 - [[job:fan_profile_enrichment|#]] — freshness SLA breached
 - [[job:fan_interaction_enrichment|#]] — processing latency increasing
-- [[job:stadium_visualization_sink|#]] — Lakebase write retries
-- + 2 other downstream assets affected
+- + 3 downstream assets affected
 
 [[embed:graph|fan-enrichment-impact|collapsed]]
-
-## Root cause
-
-The current Spark Declarative Pipeline combines too many real-time responsibilities in a single streaming workflow: reading raw fan interaction events from ZeroBus, resolving fan identity, joining profile attributes (section, seat, region, loyalty tier), maintaining state for late-arriving and anonymous events, and writing enriched records to Lakebase.
-
-During high-volume match windows the enrichment step creates high-cardinality state. As fan interactions spike, the pipeline spends more time reconciling identity and profile context before writing to Lakebase. Once the stream falls behind, Lakebase write retries compound end-to-end latency.
-
-[[embed:table|fan-enrichment-metrics|collapsed]]
-
-[[embed:chart|fan-enrichment-latency|collapsed]]
 
 ## Proposed fix
 
@@ -240,7 +233,7 @@ Split the monolithic stream into 4 staged streaming components:
                 id: 'msg-0012-01',
                 role: 'agent',
                 suggestions: [
-                    { label: 'Show sandbox validation results' },
+                    { label: 'Show full analysis' },
                     { label: 'Create pull request' },
                 ],
                 thought: {

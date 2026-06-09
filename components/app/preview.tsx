@@ -3,8 +3,7 @@
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 
-// import { ChevronDownIcon, ChevronRightIcon, FileIcon } from '@databricks/design-system'
-import { ChevronDown, ChevronRight, File } from 'lucide-react'
+import { ChevronDownIcon, ChevronRightIcon, FileIcon } from '@/lib/icons'
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
@@ -22,8 +21,8 @@ export function PreviewTrigger({ children, open }: { children?: React.ReactNode;
             {children}
 
             { open
-                ? <ChevronDown className="size-4" />
-                : <ChevronRight className="size-4" />
+                ? <ChevronDownIcon className="size-4" />
+                : <ChevronRightIcon className="size-4" />
             }
         </CollapsibleTrigger>
     )

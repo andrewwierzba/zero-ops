@@ -2,8 +2,7 @@
 
 import { format, isValid } from 'date-fns'
 
-// import { ReplyIcon } from '@databricks/design-system'
-import { CornerUpLeft } from 'lucide-react'
+import { ReplyIcon } from '@/lib/icons'
 import { ArchiveIcon, ArrowUpIcon, EllipsisVerticalIcon, FunnelIcon, MicIcon, SlidersHorizontal } from 'lucide-react'
 
 import { useRouter } from 'next/navigation'
@@ -343,13 +342,13 @@ function Page() {
                                     </svg>
 
                                     <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none text-[13px] leading-[20px] gap-1.5 w-fit" variant="secondary">
-                                        <CornerUpLeft
+                                        <ReplyIcon
                                             className="size-3.5 [&_path]:[stroke:url(#reply-icon-gradient)]"
                                         />
                                         <span>What can ZeroOps do?</span>
                                     </Button>
                                     <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none text-[13px] leading-[20px] gap-1.5 w-fit" variant="secondary">
-                                        <CornerUpLeft
+                                        <ReplyIcon
                                             className="size-3.5 [&_path]:[stroke:url(#reply-icon-gradient)]"
                                         />
                                         <span>Configure ZeroOps</span>

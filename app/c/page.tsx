@@ -1,7 +1,6 @@
 'use client'
 
-// import { ChevronDoubleLeftIcon, ForkIcon, GearIcon, PlusIcon, ShareIcon } from '@databricks/design-system'
-import { ChevronsLeft, GitFork, Plus, Settings, Share2 } from 'lucide-react'
+import { ChevronDoubleLeftIcon, ForkIcon, GearIcon, PlusIcon, ShareIcon } from '@/lib/icons'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { usePanelRef } from 'react-resizable-panels'
@@ -55,7 +54,7 @@ function Page() {
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <ChevronsLeft className="size-4" />
+                                    <ChevronDoubleLeftIcon className="size-4" />
                                 </Button>
                                 <span className="text-[13px] font-semibold min-w-0 truncate">New thread</span>
                             </div>
@@ -66,28 +65,28 @@ function Page() {
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <Plus className="size-4" />
+                                    <PlusIcon className="size-4" />
                                 </Button>
                                 <Button
                                     className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <Settings className="size-4" />
+                                    <GearIcon className="size-4" />
                                 </Button>
                                 <Button
                                     className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <Share2 className="size-4" />
+                                    <ShareIcon className="size-4" />
                                 </Button>
                                 <Button
                                     className="hover:bg-[rgb(34,114,180)]/8 dark:hover:bg-[rgb(143,205,255)]/8 rounded-[4px] text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] hover:text-[rgb(14,83,139)] dark:hover:text-[rgb(138,202,255)]"
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <GitFork className="size-4" />
+                                    <ForkIcon className="size-4" />
                                 </Button>
                             </div>
                         </div>

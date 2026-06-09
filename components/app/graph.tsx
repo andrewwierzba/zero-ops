@@ -15,8 +15,7 @@ import 'reactflow/dist/style.css'
 
 import { cn } from '@/lib/utils'
 
-// import { CheckCircleIcon, GridDashIcon } from '@databricks/design-system'
-import { CheckCircle, Grid3X3 } from 'lucide-react'
+import { CheckCircleIcon, GridDashIcon } from '@/lib/icons'
 
 import { Separator } from '@/components/ui/separator'
 
@@ -33,7 +32,7 @@ interface StepNodeData {
 }
 
 function StepNode({ data }: { data: StepNodeData }) {
-    const Icon = data.icon ?? Grid3X3
+    const Icon = data.icon ?? GridDashIcon
 
     return (
         <div
@@ -53,7 +52,7 @@ function StepNode({ data }: { data: StepNodeData }) {
                 </span>
                 {data.status === 'success' && (
                     <div aria-label='step-status' className='flex h-6 items-center justify-center w-6'>
-                        <CheckCircle
+                        <CheckCircleIcon
                             className='text-[rgb(39,124,67)] dark:text-[rgb(59,166,94)] size-4'
                         />
                     </div>

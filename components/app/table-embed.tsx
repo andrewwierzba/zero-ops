@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { TableIcon } from 'lucide-react'
+import { TableIcon } from '@/lib/icons'
 
 import { Preview, PreviewContent, PreviewTrigger } from '@/components/app/preview'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -13,7 +13,7 @@ export type TableEmbedMode = 'collapsed' | 'expanded'
 
 function TableCanvas({ table }: { table: TableDef }) {
     return (
-        <Table>
+        <Table className="text-[13px] leading-[20px]">
             <TableHeader>
                 <TableRow>
                     {table.columns.map((col) => (

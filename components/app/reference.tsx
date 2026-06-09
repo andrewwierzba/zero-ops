@@ -1,13 +1,12 @@
 import { cn } from '@/lib/utils'
 
-// import { FileIcon, PipelineIcon, TableIcon, WorkflowsIcon } from '@databricks/design-system'
-import { File, GitBranch, Table, Workflow } from 'lucide-react'
+import { FileIcon, PipelineIcon, TableIcon, WorkflowsIcon } from '@/lib/icons'
 
 const Icons = {
-    file: File,
-    job: Workflow,
-    pipeline: GitBranch,
-    table: Table,
+    file: FileIcon,
+    job: WorkflowsIcon,
+    pipeline: PipelineIcon,
+    table: TableIcon,
 } as const
 
 export type AssetKind = keyof typeof Icons
