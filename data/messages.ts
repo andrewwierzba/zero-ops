@@ -205,11 +205,13 @@ export const defaultMessages: ThreadMessages[] = [
                 },
                 content: `# Fan interaction enrichment falling behind real-time demand
 
-The fan interaction enrichment pipeline is falling behind during peak match windows. The root cause is a monolithic Spark Streaming workflow that combines identity resolution, profile enrichment, and stateful writes in a single job. During traffic spikes, high-cardinality state accumulates faster than it can be flushed to Lakebase, and write retries compound end-to-end latency.
+The fan interaction enrichment pipeline is falling behind during peak match windows.
+
+[[embed:chart|fan-enrichment-latency]]
+
+The root cause is a monolithic Spark Streaming workflow that combines identity resolution, profile enrichment, and stateful writes in a single job. During traffic spikes, high-cardinality state accumulates faster than it can be flushed to Lakebase.
 
 [[embed:table|fan-enrichment-metrics|collapsed]]
-
-[[embed:chart|fan-enrichment-latency|collapsed]]
 
 ## Impact
 
