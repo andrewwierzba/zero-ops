@@ -6,6 +6,24 @@ import { InboxIcon, SquarePenIcon } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+function formatRelativeTime(iso: string): string {
+    const d = new Date(iso)
+    if (isNaN(d.getTime())) return '—'
+    const now = new Date()
+    const ms = now.getTime() - d.getTime()
+    if (ms < 0) return '—'
+    const minutes = Math.floor(ms / 60_000)
+    if (minutes < 1) return 'now'
+    if (minutes < 60) return `${minutes}m`
+    const hours = Math.floor(minutes / 60)
+    if (hours < 24) return `${hours}h`
+    const days = Math.floor(hours / 24)
+    if (days < 7) return `${days}d`
+    const weeks = Math.floor(days / 7)
+    if (weeks < 8) return `${weeks}w`
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+}
+
 import { PanelLeftCloseIcon } from '@/app/assets/icons/panel-left-close'
 import { PanelLeftOpenIcon } from '@/app/assets/icons/panel-left-open'
 
@@ -137,7 +155,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                                 </span>
                                 <span className="text-[13px] font-normal text-left truncate w-full">{thread.label}</span>
                                 <span aria-describedby="Last updated" className="text-muted-foreground text-xs mt-0.5">
-                                    2m
+                                    {formatRelativeTime(thread.updated_at)}
                                 </span>
                             </Button>
                         ))}

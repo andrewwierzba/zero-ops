@@ -268,7 +268,7 @@ function Page({ params }: PageProps) {
                                                                 <div className="flex flex-wrap gap-2 pt-1">
                                                                     {message.suggestions.map((suggestion) => (
                                                                         <Button
-                                                                            className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none gap-1.5 w-fit"
+                                                                            className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none text-[13px] leading-[20px] gap-1.5 w-fit"
                                                                             key={suggestion.label}
                                                                             onClick={() => handleSubmit(suggestion.label)}
                                                                             variant="secondary"

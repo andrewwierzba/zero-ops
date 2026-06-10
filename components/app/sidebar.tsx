@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 import { CompassIcon } from 'lucide-react'
 
-import { BeakerIcon, ChecklistIcon, ClockIcon, CloudDatabaseIcon, CloudIcon, CloudModelIcon, DashboardIcon, DatabaseIcon, HistoryIcon, IngestionIcon, LayerIcon, ModelsIcon, NotebookIcon, NotificationIcon, PlusIcon, QueryEditorIcon, QueryIcon, SparkleDoubleIcon, StorefrontIcon, UserSparkleIcon, WorkflowsIcon } from '@/lib/icons'
+import { BeakerIcon, ChecklistIcon, ClockIcon, CloudDatabaseIcon, CloudIcon, CloudModelIcon, DashboardIcon, DatabaseIcon, HistoryIcon, IngestionIcon, LayerIcon, ModelsIcon, NotebookIcon, NotificationIcon, PlusIcon, QueryEditorIcon, QueryIcon, SparkleDoubleIcon, SparkleRectangleIcon, StorefrontIcon, UserSparkleIcon, WorkflowsIcon } from '@/lib/icons'
 
 export function Sidebar({
     groups = [{
@@ -54,8 +54,8 @@ export function Sidebar({
             label: 'Dashboards'
          }, {
             href: '/genie',
-            icon: SparkleDoubleIcon,
-            label: 'Genie'
+            icon: SparkleRectangleIcon,
+            label: 'Genie Spaces'
          }, {
             href: '/sql/alerts',
             icon: NotificationIcon,
