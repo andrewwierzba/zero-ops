@@ -104,7 +104,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                             onClick={handleNewThread}
                             variant="ghost"
                         >
-                            <SquarePenIcon className="size-4" />
+                            <SquarePenIcon className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
                             New thread
                         </Button>
 
@@ -113,7 +113,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                             onClick={() => router.push('/c/customizations')}
                             variant="ghost"
                         >
-                            <SlidersIcon className="size-4" />
+                            <SlidersIcon className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
                             Customizations
                         </Button>
 
@@ -122,7 +122,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                             onClick={() => router.push('/c/automations')}
                             variant="ghost"
                         >
-                            <ClockIcon className="size-4" />
+                            <ClockIcon className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
                             Automations
                         </Button>
 
@@ -131,7 +131,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                             onClick={() => router.push('/c/inbox')}
                             variant="ghost"
                         >
-                            <InboxIcon className="size-4" />
+                            <InboxIcon className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
                             Inbox
                         </Button>
                     </div>
@@ -141,7 +141,7 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                             className="text-[13px] font-normal gap-2 justify-start"
                             variant="ghost"
                         >
-                            <SearchIcon className="size-4" />
+                            <SearchIcon className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
                             Search
                         </Button>
                     </div>

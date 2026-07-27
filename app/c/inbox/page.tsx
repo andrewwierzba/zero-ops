@@ -294,7 +294,7 @@ function Page() {
                                     onClick={handleConfigure}
                                     variant="outline"
                                 >
-                                    <SlidersIcon className="size-4" />
+                                    <SlidersIcon className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
                                     <span>Configuration</span>
                                 </Button>
                             </div>
