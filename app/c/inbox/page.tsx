@@ -2,8 +2,8 @@
 
 import { format, isValid } from 'date-fns'
 
-import { ReplyIcon } from '@/lib/icons'
-import { ArchiveIcon, ArrowUpIcon, EllipsisVerticalIcon, FunnelIcon, MicIcon, SlidersHorizontal } from 'lucide-react'
+import { ReplyIcon, SlidersIcon } from '@/lib/icons'
+import { ArchiveIcon, ArrowUpIcon, EllipsisVerticalIcon, FunnelIcon, MicIcon } from 'lucide-react'
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -289,13 +289,13 @@ function Page() {
                                     <h1 className="text-2xl font-bold">Inbox</h1>
                                 </div>
                                 <Button
-                                    aria-label="Configure ZeroOps"
+                                    aria-label="ZeroOps configuration"
                                     className="rounded-[4px] text-[13px] leading-[20px]"
                                     onClick={handleConfigure}
                                     variant="outline"
                                 >
-                                    <SlidersHorizontal className="size-4" />
-                                    <span>Configure</span>
+                                    <SlidersIcon className="size-4" />
+                                    <span>Configuration</span>
                                 </Button>
                             </div>
 
