@@ -1,6 +1,6 @@
 'use client'
 
-import { OverflowIcon, SearchIcon } from '@/lib/icons'
+import { ClockIcon, OverflowIcon, SearchIcon, SlidersIcon } from '@/lib/icons'
 import { InboxIcon, SquarePenIcon } from 'lucide-react'
 
 import { usePathname, useRouter } from 'next/navigation'
@@ -109,26 +109,23 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                         </Button>
 
                         <Button
-                            className="text-[13px] font-normal gap-2 justify-start"
+                            className={`text-[13px] font-normal gap-2 justify-start ${isActive('/c/customizations') ? 'bg-muted' : ''}`}
+                            onClick={() => router.push('/c/customizations')}
                             variant="ghost"
                         >
-                            <SearchIcon
-                                className="size-4"
-                            />
-                            Search
+                            <SlidersIcon className="size-4" />
+                            Customizations
                         </Button>
 
-                        {/* <Button
-                            className={`gap-2 justify-start ${isActive('/c/configure') ? 'bg-muted' : ''}`}
-                            onClick={() => router.push('/c/configure')}
+                        <Button
+                            className={`text-[13px] font-normal gap-2 justify-start ${isActive('/c/automations') ? 'bg-muted' : ''}`}
+                            onClick={() => router.push('/c/automations')}
                             variant="ghost"
                         >
-                            <SettingsIcon className="size-4" />
-                            Configure
-                        </Button> */}
-                    </div>
+                            <ClockIcon className="size-4" />
+                            Automations
+                        </Button>
 
-                    <div className="flex flex-col">
                         <Button
                             className={`text-[13px] font-normal gap-2 justify-start ${isActive('/c/inbox') ? 'bg-muted' : ''}`}
                             onClick={() => router.push('/c/inbox')}
@@ -136,6 +133,16 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                         >
                             <InboxIcon className="size-4" />
                             Inbox
+                        </Button>
+                    </div>
+
+                    <div className="flex flex-col">
+                        <Button
+                            className="text-[13px] font-normal gap-2 justify-start"
+                            variant="ghost"
+                        >
+                            <SearchIcon className="size-4" />
+                            Search
                         </Button>
                     </div>
 
