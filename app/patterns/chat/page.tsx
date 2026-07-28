@@ -144,131 +144,159 @@ const actionableGroup: CodeChangeData = {
     style: 'group',
 }
 
+const navItems = [
+    { href: '#bubble', label: 'Bubble' },
+    { href: '#code-block', label: 'Code block' },
+    { href: '#code-change', label: 'Code change' },
+    { href: '#preview', label: 'Preview' },
+    { href: '#graph', label: 'Graph' },
+    { href: '#chart', label: 'Chart' },
+] as const
+
 function Page() {
     const [previewDemoOpen, setPreviewDemoOpen] = useState(false)
     const [lineageOpen, setLineageOpen] = useState(false)
 
     return (
-        <div className="overflow-y-scroll py-6 text-[13px]">
-            <div className="flex flex-col gap-4 mx-auto max-w-3xl w-full">
-                <h4 className="text-xl font-bold">Bubble</h4>
-                <div className="border rounded-4xl flex flex-col gap-2 p-4">
-                    <Bubble align="end" className="bg-[rgb(240,248,255)] dark:bg-[rgb(4,53,93)] rounded-br-none text-default">
-                        <BubbleContent>What is Genie Code?</BubbleContent>
-                    </Bubble>
-                    <Bubble
-                        align="start"
-                        className="bg-transparent rounded-none"
-                        variant="secondary"
+        <div className="flex flex-1 gap-6 min-h-0 overflow-hidden">
+            <nav className="flex flex-col gap-1 p-6 shrink-0 w-64">
+                {navItems.map(({ href, label }) => (
+                    <a
+                        className="hover:bg-accent rounded-lg text-sm px-3 py-2"
+                        href={href}
+                        key={href}
+                        onClick={(event) => {
+                            event.preventDefault()
+                            document.getElementById(href.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                        }}
                     >
-                        <BubbleContent>
-                            Genie Code is Databricks&apos; AI assistant for data and AI workflows.
-                            It helps you write, debug, and optimize code across notebooks, jobs, and
-                            pipelines — all within your Databricks workspace.
-                        </BubbleContent>
-                    </Bubble>
-                </div>
+                        {label}
+                    </a>
+                ))}
+            </nav>
+            <div className="flex-1 min-w-0 overflow-y-auto py-6 text-[13px]">
+                <div className="flex flex-col gap-4 mx-auto max-w-3xl w-full">
+                    <h4 className="text-xl font-bold" id="bubble">Bubble</h4>
+                    <div className="border rounded-4xl flex flex-col gap-2 p-4">
+                        <Bubble align="end" className="bg-[rgb(240,248,255)] dark:bg-[rgb(4,53,93)] rounded-br-none text-default">
+                            <BubbleContent>What is Genie Code?</BubbleContent>
+                        </Bubble>
+                        <Bubble
+                            align="start"
+                            className="bg-transparent rounded-none"
+                            variant="secondary"
+                        >
+                            <BubbleContent>
+                                Genie Code is Databricks&apos; AI assistant for data and AI workflows.
+                                It helps you write, debug, and optimize code across notebooks, jobs, and
+                                pipelines — all within your Databricks workspace.
+                            </BubbleContent>
+                        </Bubble>
+                    </div>
 
-                <h4 className="text-xl font-bold">Code block</h4>
+                    <h4 className="text-xl font-bold" id="code-block">Code block</h4>
 
-                <h6 className="text-md font-bold">Default</h6>
-                <CodeBlock className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)]" language="python">
-                    {`def get_user(id):
-    user = db.query(User).filter(User.id == id).first()
-    if user is None:
-        raise NotFound()
-    return user`}
-                </CodeBlock>
+                    <h6 className="text-md font-bold">Default</h6>
+                    <CodeBlock className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)]" language="python">
+                        {`def get_user(id):
+        user = db.query(User).filter(User.id == id).first()
+        if user is None:
+            raise NotFound()
+        return user`}
+                    </CodeBlock>
 
-                <h6 className="text-md font-bold">File change</h6>
-                <CodeChange {...fileChangeUsers} />
+                    <h4 className="text-xl font-bold" id="code-change">Code change</h4>
 
-                <h6 className="text-md font-bold">Actionable</h6>
-                <CodeChange {...actionableSingle} />
-                <CodeChange {...actionableGroup} />
+                    <h6 className="text-md font-bold">File change</h6>
+                    <CodeChange {...fileChangeUsers} />
 
-                <h4 className="text-2xl font-bold">Preview</h4>
-                <Preview onOpenChange={setPreviewDemoOpen} open={previewDemoOpen}>
-                    <PreviewTrigger open={previewDemoOpen}>
-                        <span className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1">
-                            <DagIcon
-                                className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
-                            />
-                        </span>
-                        <span className="flex-1 text-left">Preview</span>
-                    </PreviewTrigger>
-                    <PreviewContent>
-                        <span>PreviewContent</span>
-                    </PreviewContent>
-                </Preview>
+                    <h6 className="text-md font-bold">Actionable</h6>
+                    <CodeChange {...actionableSingle} />
+                    <CodeChange {...actionableGroup} />
 
-                <h4 className="text-2xl font-bold">Examples</h4>
-                <h6 className="text-xl font-bold">Lineage</h6>
-                <Preview onOpenChange={setLineageOpen} open={lineageOpen}>
-                    <PreviewTrigger open={lineageOpen}>
-                        <span className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1">
-                            <DagIcon
-                                className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
-                            />
-                        </span>
-                        <div className="items-center flex flex-1 gap-2 text-left">
-                            <span>Lineage graph</span>
-                            <span className="text-muted-foreground">3 steps</span>
-                        </div>
-                    </PreviewTrigger>
-                    <PreviewContent className="p-0">
-                        <Graph className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] h-74" graph={graph} />
-                    </PreviewContent>
-                </Preview>
+                    <h4 className="text-2xl font-bold" id="preview">Preview</h4>
+                    <Preview onOpenChange={setPreviewDemoOpen} open={previewDemoOpen}>
+                        <PreviewTrigger open={previewDemoOpen}>
+                            <span className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1">
+                                <DagIcon
+                                    className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
+                                />
+                            </span>
+                            <span className="flex-1 text-left">Preview</span>
+                        </PreviewTrigger>
+                        <PreviewContent>
+                            <span>PreviewContent</span>
+                        </PreviewContent>
+                    </Preview>
 
-                <h6 className="text-xl font-bold">Chart</h6>
-                <div className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] border-[rgb(235,235,235)] dark:border-[rgb(31,39,45)] border rounded-[4px] flex flex-col gap-2 p-4 w-full">
-                    <span className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] text-sm truncate">claims_enrichment_daily committed output rows · 1 hour</span>
-                    <ChartContainer className="h-30 w-full" config={chartConfig}>
-                        <AreaChart data={chartData} margin={{ left: 0, right: 8, top: 8 }}>
-                            <defs>
-                                <linearGradient id="rowsFill" x1="0" y1="0" x2="1" y2="0">
-                                    <stop offset="75%" stopColor="rgb(34,114,180)" stopOpacity={0.1} />
-                                    <stop offset="75%" stopColor="rgb(200,45,76)" stopOpacity={0.1} />
-                                </linearGradient>
-                                <linearGradient id="rowsStroke" x1="0" y1="0" x2="1" y2="0">
-                                    <stop offset="75%" stopColor="rgb(34,114,180)" />
-                                    <stop offset="75%" stopColor="rgb(200,45,76)" />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid vertical={false} />
-                            <XAxis
-                                axisLine={false}
-                                dataKey="time"
-                                interval={2}
-                                padding={{ left: 16, right: 16 }}
-                                tickLine={false}
-                                tickMargin={8}
-                            />
-                            <YAxis
-                                axisLine={false}
-                                tickFormatter={(value) => value === 0 ? '0' : `${value / 1000}k`}
-                                tickLine={false}
-                                tickMargin={4}
-                                width={36}
-                            />
-                            <ChartTooltip
-                                content={
-                                    <ChartTooltipContent
-                                        formatter={(value) => (value as number).toLocaleString()}
-                                        indicator="line"
-                                    />
-                                }
-                            />
-                            <Area
-                                dataKey="rows"
-                                fill="url(#rowsFill)"
-                                stroke="url(#rowsStroke)"
-                                strokeWidth={2}
-                                type="stepAfter"
-                            />
-                        </AreaChart>
-                    </ChartContainer>
+                    <h4 className="text-2xl font-bold">Examples</h4>
+                    <h6 className="text-xl font-bold" id="graph">Graph</h6>
+                    <Preview onOpenChange={setLineageOpen} open={lineageOpen}>
+                        <PreviewTrigger open={lineageOpen}>
+                            <span className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1">
+                                <DagIcon
+                                    className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
+                                />
+                            </span>
+                            <div className="items-center flex flex-1 gap-2 text-left">
+                                <span>Lineage graph</span>
+                                <span className="text-muted-foreground">3 steps</span>
+                            </div>
+                        </PreviewTrigger>
+                        <PreviewContent className="p-0">
+                            <Graph className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] h-74" graph={graph} />
+                        </PreviewContent>
+                    </Preview>
+
+                    <h6 className="text-xl font-bold" id="chart">Chart</h6>
+                    <div className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] border-[rgb(235,235,235)] dark:border-[rgb(31,39,45)] border rounded-[4px] flex flex-col gap-2 p-4 w-full">
+                        <span className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] text-sm truncate">claims_enrichment_daily committed output rows · 1 hour</span>
+                        <ChartContainer className="h-30 w-full" config={chartConfig}>
+                            <AreaChart data={chartData} margin={{ left: 0, right: 8, top: 8 }}>
+                                <defs>
+                                    <linearGradient id="rowsFill" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="75%" stopColor="rgb(34,114,180)" stopOpacity={0.1} />
+                                        <stop offset="75%" stopColor="rgb(200,45,76)" stopOpacity={0.1} />
+                                    </linearGradient>
+                                    <linearGradient id="rowsStroke" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="75%" stopColor="rgb(34,114,180)" />
+                                        <stop offset="75%" stopColor="rgb(200,45,76)" />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid vertical={false} />
+                                <XAxis
+                                    axisLine={false}
+                                    dataKey="time"
+                                    interval={2}
+                                    padding={{ left: 16, right: 16 }}
+                                    tickLine={false}
+                                    tickMargin={8}
+                                />
+                                <YAxis
+                                    axisLine={false}
+                                    tickFormatter={(value) => value === 0 ? '0' : `${value / 1000}k`}
+                                    tickLine={false}
+                                    tickMargin={4}
+                                    width={36}
+                                />
+                                <ChartTooltip
+                                    content={
+                                        <ChartTooltipContent
+                                            formatter={(value) => (value as number).toLocaleString()}
+                                            indicator="line"
+                                        />
+                                    }
+                                />
+                                <Area
+                                    dataKey="rows"
+                                    fill="url(#rowsFill)"
+                                    stroke="url(#rowsStroke)"
+                                    strokeWidth={2}
+                                    type="stepAfter"
+                                />
+                            </AreaChart>
+                        </ChartContainer>
+                    </div>
                 </div>
             </div>
         </div>
