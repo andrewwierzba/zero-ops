@@ -8,6 +8,7 @@ import { DagIcon } from '@/lib/icons'
 
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 
+import { Bubble, BubbleContent, BubbleGroup } from '@/components/app/bubble'
 import { CodeBlock } from '@/components/app/code-block'
 import { CodeChange } from '@/components/app/code-change'
 import { Graph } from '@/components/app/graph'
@@ -150,6 +151,24 @@ function Page() {
     return (
         <div className="overflow-y-scroll py-6 text-[13px]">
             <div className="flex flex-col gap-4 mx-auto max-w-3xl w-full">
+                <h4 className="text-xl font-bold">Bubble</h4>
+                <div className="border rounded-4xl flex flex-col gap-2 p-4">
+                    <Bubble align="end" className="bg-[rgb(240,248,255)] dark:bg-[rgb(4,53,93)] rounded-br-none text-default">
+                        <BubbleContent>What is Genie Code?</BubbleContent>
+                    </Bubble>
+                    <Bubble
+                        align="start"
+                        className="bg-transparent rounded-none"
+                        variant="secondary"
+                    >
+                        <BubbleContent>
+                            Genie Code is Databricks&apos; AI assistant for data and AI workflows.
+                            It helps you write, debug, and optimize code across notebooks, jobs, and
+                            pipelines — all within your Databricks workspace.
+                        </BubbleContent>
+                    </Bubble>
+                </div>
+
                 <h4 className="text-xl font-bold">Code block</h4>
 
                 <h6 className="text-md font-bold">Default</h6>
