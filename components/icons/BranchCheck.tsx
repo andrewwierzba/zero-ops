@@ -1,0 +1,18 @@
+import { forwardRef } from "react"
+
+/** use:action branch merged | repos, git, approved, PR merged */
+const BranchCheck = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement> & { size?: number }>(
+  ({ className, size = 16, ...props }, ref) => (
+    <svg ref={ref} className={className} {...props} width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+      fill="currentColor"
+      fillRule="evenodd"
+      d="M3.75 1a2.748 2.748 0 0 1 .75 5.393v3.213A2.749 2.749 0 0 1 3.75 15 2.75 2.75 0 0 1 3 9.606V6.393A2.748 2.748 0 0 1 3.75 1m0 10a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5m0-8.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5"
+      clipRule="evenodd"
+      />
+      <path fill="currentColor" d="M15.03 5.53 9.5 11.06 6.47 8.03l1.06-1.06L9.5 8.94l4.47-4.47z" />
+    </svg>
+  )
+)
+BranchCheck.displayName = "BranchCheck"
+export { BranchCheck }
