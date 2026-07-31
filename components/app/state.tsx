@@ -20,13 +20,13 @@ interface StateProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<
 
 function State({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
     return (
-        <div className={cn('dark:bg-neutral-800 rounded-xl flex flex-col gap-2 p-0.5', className)} {...props} />
+        <div className={cn('bg-neutral-100 dark:bg-neutral-800 rounded-xl flex flex-col gap-2 p-0.5', className)} {...props} />
     )
 }
 
 function StateContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
     return (
-        <div className={cn('flex flex-col gap-2', className)} {...props} />
+        <div className={cn('flex flex-col gap-1 pb-1', className)} {...props} />
     )
 }
 

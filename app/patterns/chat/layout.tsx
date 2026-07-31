@@ -10,6 +10,7 @@ const navItems = [
     { href: '/patterns/chat/code-change', label: 'Code change' },
     { href: '/patterns/chat/graph', label: 'Graph' },
     { href: '/patterns/chat/preview', label: 'Preview' },
+    { href: '/patterns/chat/state', label: 'State' },
 ] as const
 
 function ChatNav() {
