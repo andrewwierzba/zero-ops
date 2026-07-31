@@ -1,303 +1,90 @@
 'use client'
 
 import { useState } from 'react'
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
-
-import { GitPullRequestIcon } from 'lucide-react'
-import { DagIcon } from '@/lib/icons'
-
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 
 import { Bubble, BubbleContent, BubbleGroup } from '@/components/app/bubble'
+import { Chatbox } from '@/components/app/chatbox'
 import { CodeBlock } from '@/components/app/code-block'
-import { CodeChange } from '@/components/app/code-change'
-import { Graph } from '@/components/app/graph'
-import { Preview, PreviewContent, PreviewTrigger } from '@/components/app/preview'
+import { State, StateContent, StateHead, StateItem } from '@/components/app/state'
 
-import { GraphDef } from '@/data/graphs'
-import { CodeChange as CodeChangeData } from '@/data/messages'
+import { ChevronDown } from '@/components/icons/ChevronDown'
+import { ChevronRight } from '@/components/icons/ChevronRight'
 
-const graph: GraphDef = {
-    title: 'Example',
-    nodes: [
-        {
-            id: '0',
-            label: 'Ingest events',
-            position: { x: 50, y: 50 },
-            content: { label: 'Source', value: '/pipelines/bronze/raw_events' },
-            showTarget: false,
-            taskType: 'notebook',
-        },
-        {
-            id: '1',
-            label: 'Transform',
-            position: { x: 340, y: 50 },
-            content: { label: 'Job', value: '/workflows/transform_daily' },
-            taskType: 'python-script',
-        },
-        {
-            id: '2',
-            label: 'Publish',
-            position: { x: 630, y: 50 },
-            content: { label: 'Target', value: '/pipelines/gold/events_dashboard' },
-            showSource: false,
-            taskType: 'pipeline',
-        },
-    ],
-    edges: [
-        { id: 'e0-1', source: '0', target: '1' },
-        { id: 'e1-2', source: '1', target: '2' },
-    ],
-}
-
-const chartConfig = {
-    rows: {
-        label: 'Committed rows',
-        color: 'rgb(34,114,180)',
-    },
-} satisfies ChartConfig
-
-const chartData = [
-    { time: '14:00', rows: 16240 },
-    { time: '14:05', rows: 15890 },
-    { time: '14:10', rows: 17120 },
-    { time: '14:15', rows: 16780 },
-    { time: '14:20', rows: 16350 },
-    { time: '14:25', rows: 17200 },
-    { time: '14:30', rows: 16950 },
-    { time: '14:35', rows: 16480 },
-    { time: '14:40', rows: 17050 },
-    { time: '14:45', rows: 0 },
-    { time: '14:50', rows: 0 },
-    { time: '14:55', rows: 0 },
-    { time: '15:00', rows: 0 },
-]
-
-const fileChangeUsers: CodeChangeData = {
-    files: [
-        {
-            code: `- def get_user(id):
-+ def get_user(id: int) -> User:
-+     """Fetch a user by id."""
-  user = db.query(User).filter(User.id == id).first()
-  if user is None:
-      raise NotFound()
-  return user`,
-            filename: 'users.py',
-            language: 'diff',
-        },
-    ],
-    style: 'single',
-}
-
-const actionableSingle: CodeChangeData = {
-    actions: [
-        { label: 'Review', variant: 'secondary' },
-        { icon: GitPullRequestIcon, label: 'Create pull request', variant: 'primary' },
-    ],
-    files: [
-        {
-            code: `- def get_user(id):
-+ def get_user(id: int) -> User:
-+     """Fetch a user by id."""
-  user = db.query(User).filter(User.id == id).first()
-  if user is None:
-      raise NotFound()
-  return user`,
-            filename: 'users.py',
-            language: 'diff',
-        },
-    ],
-    style: 'group',
-}
-
-const actionableGroup: CodeChangeData = {
-    actions: [
-        { label: 'Review', variant: 'secondary' },
-        { icon: GitPullRequestIcon, label: 'Create pull request', variant: 'primary' },
-    ],
-    files: [
-        {
-            code: `- def get_user(id):
-+ def get_user(id: int) -> User:
-+     """Fetch a user by id."""
-  user = db.query(User).filter(User.id == id).first()
-  if user is None:
-      raise NotFound()
-  return user`,
-            filename: 'users.py',
-            language: 'diff',
-        },
-        {
-            code: `- def login(email, password):
--     user = User.query.filter_by(email=email).first()
--     return user.token
-+ def login(email: str, password: str) -> str:
-+     user = User.query.filter_by(email=email).first()
-+     if not user or not user.check_password(password):
-+         raise AuthError("Invalid credentials")
-+     return create_token(user.id)`,
-            filename: 'auth.py',
-            language: 'diff',
-        },
-    ],
-    style: 'group',
-}
-
-const navItems = [
-    { href: '#bubble', label: 'Bubble' },
-    { href: '#code-block', label: 'Code block' },
-    { href: '#code-change', label: 'Code change' },
-    { href: '#preview', label: 'Preview' },
-    { href: '#graph', label: 'Graph' },
-    { href: '#chart', label: 'Chart' },
-] as const
+import { Button } from '@/components/ui/button'
 
 function Page() {
-    const [previewDemoOpen, setPreviewDemoOpen] = useState(false)
-    const [lineageOpen, setLineageOpen] = useState(false)
+    const [state, setState] = useState(true)
+    const [stateIsOpen, setStateIsOpen] = useState(true)
 
     return (
-        <div className="flex flex-1 gap-6 min-h-0 overflow-hidden">
-            <nav className="flex flex-col gap-1 p-6 shrink-0 w-64">
-                {navItems.map(({ href, label }) => (
-                    <a
-                        className="hover:bg-accent rounded-lg text-sm px-3 py-2"
-                        href={href}
-                        key={href}
-                        onClick={(event) => {
-                            event.preventDefault()
-                            document.getElementById(href.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                        }}
-                    >
-                        {label}
-                    </a>
-                ))}
-            </nav>
-            <div className="flex-1 min-w-0 overflow-y-auto py-6 text-[13px]">
-                <div className="flex flex-col gap-4 mx-auto max-w-3xl w-full">
-                    <h4 className="text-xl font-bold" id="bubble">Bubble</h4>
-                    <div className="border rounded-4xl flex flex-col gap-2 p-4">
-                        <Bubble align="end" className="bg-[rgb(240,248,255)] dark:bg-[rgb(4,53,93)] rounded-br-none text-default">
-                            <BubbleContent>What is Genie Code?</BubbleContent>
-                        </Bubble>
-                        <Bubble
-                            align="start"
-                            className="bg-transparent rounded-none"
-                            variant="secondary"
-                        >
-                            <BubbleContent>
-                                Genie Code is Databricks&apos; AI assistant for data and AI workflows.
-                                It helps you write, debug, and optimize code across notebooks, jobs, and
-                                pipelines — all within your Databricks workspace.
-                            </BubbleContent>
-                        </Bubble>
-                    </div>
-
-                    <h4 className="text-xl font-bold" id="code-block">Code block</h4>
-
-                    <h6 className="text-md font-bold">Default</h6>
-                    <CodeBlock className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)]" language="python">
-                        {`def get_user(id):
-        user = db.query(User).filter(User.id == id).first()
-        if user is None:
-            raise NotFound()
-        return user`}
+        <div className="flex flex-col gap-4 mx-auto max-w-3xl w-full">
+            <h1 className="text-3xl font-bold">Chat</h1>
+            <div className="border rounded-4xl flex flex-col gap-2 p-4">
+                <BubbleGroup>
+                    <Bubble align="end">
+                        <BubbleContent>
+                            Write a SQL query for top customers by revenue this quarter.
+                        </BubbleContent>
+                    </Bubble>
+                </BubbleGroup>
+                <BubbleGroup>
+                    <Bubble align="start" variant="secondary">
+                        <BubbleContent>
+                            Aggregate orders for the current quarter, then rank by total
+                            revenue:
+                        </BubbleContent>
+                    </Bubble>
+                    <CodeBlock language="sql">
+                        {`SELECT
+    customer_id,
+    SUM(amount) AS revenue
+FROM main.sales.orders
+WHERE order_date >= DATE_TRUNC('QUARTER', CURRENT_DATE())
+GROUP BY customer_id
+ORDER BY revenue DESC
+LIMIT 10`}
                     </CodeBlock>
+                </BubbleGroup>
 
-                    <h4 className="text-xl font-bold" id="code-change">Code change</h4>
-
-                    <h6 className="text-md font-bold">File change</h6>
-                    <CodeChange {...fileChangeUsers} />
-
-                    <h6 className="text-md font-bold">Actionable</h6>
-                    <CodeChange {...actionableSingle} />
-                    <CodeChange {...actionableGroup} />
-
-                    <h4 className="text-2xl font-bold" id="preview">Preview</h4>
-                    <Preview onOpenChange={setPreviewDemoOpen} open={previewDemoOpen}>
-                        <PreviewTrigger open={previewDemoOpen}>
-                            <span className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1">
-                                <DagIcon
-                                    className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
-                                />
-                            </span>
-                            <span className="flex-1 text-left">Preview</span>
-                        </PreviewTrigger>
-                        <PreviewContent>
-                            <span>PreviewContent</span>
-                        </PreviewContent>
-                    </Preview>
-
-                    <h4 className="text-2xl font-bold">Examples</h4>
-                    <h6 className="text-xl font-bold" id="graph">Graph</h6>
-                    <Preview onOpenChange={setLineageOpen} open={lineageOpen}>
-                        <PreviewTrigger open={lineageOpen}>
-                            <span className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] rounded-sm inline-flex p-1">
-                                <DagIcon
-                                    className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]"
-                                />
-                            </span>
-                            <div className="items-center flex flex-1 gap-2 text-left">
-                                <span>Lineage graph</span>
-                                <span className="text-muted-foreground">3 steps</span>
-                            </div>
-                        </PreviewTrigger>
-                        <PreviewContent className="p-0">
-                            <Graph className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] h-74" graph={graph} />
-                        </PreviewContent>
-                    </Preview>
-
-                    <h6 className="text-xl font-bold" id="chart">Chart</h6>
-                    <div className="bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] border-[rgb(235,235,235)] dark:border-[rgb(31,39,45)] border rounded-[4px] flex flex-col gap-2 p-4 w-full">
-                        <span className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] text-sm truncate">claims_enrichment_daily committed output rows · 1 hour</span>
-                        <ChartContainer className="h-30 w-full" config={chartConfig}>
-                            <AreaChart data={chartData} margin={{ left: 0, right: 8, top: 8 }}>
-                                <defs>
-                                    <linearGradient id="rowsFill" x1="0" y1="0" x2="1" y2="0">
-                                        <stop offset="75%" stopColor="rgb(34,114,180)" stopOpacity={0.1} />
-                                        <stop offset="75%" stopColor="rgb(200,45,76)" stopOpacity={0.1} />
-                                    </linearGradient>
-                                    <linearGradient id="rowsStroke" x1="0" y1="0" x2="1" y2="0">
-                                        <stop offset="75%" stopColor="rgb(34,114,180)" />
-                                        <stop offset="75%" stopColor="rgb(200,45,76)" />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid vertical={false} />
-                                <XAxis
-                                    axisLine={false}
-                                    dataKey="time"
-                                    interval={2}
-                                    padding={{ left: 16, right: 16 }}
-                                    tickLine={false}
-                                    tickMargin={8}
-                                />
-                                <YAxis
-                                    axisLine={false}
-                                    tickFormatter={(value) => value === 0 ? '0' : `${value / 1000}k`}
-                                    tickLine={false}
-                                    tickMargin={4}
-                                    width={36}
-                                />
-                                <ChartTooltip
-                                    content={
-                                        <ChartTooltipContent
-                                            formatter={(value) => (value as number).toLocaleString()}
-                                            indicator="line"
-                                        />
-                                    }
-                                />
-                                <Area
-                                    dataKey="rows"
-                                    fill="url(#rowsFill)"
-                                    stroke="url(#rowsStroke)"
-                                    strokeWidth={2}
-                                    type="stepAfter"
-                                />
-                            </AreaChart>
-                        </ChartContainer>
-                    </div>
-                </div>
+                {state ? (
+                    <State className="gap-1">
+                        {stateIsOpen ? ( 
+                            <>
+                                <StateHead className="flex-row p-1" onClick={() => setStateIsOpen(false)}>
+                                    <div className="items-center flex flex-1 flex-row gap-2">
+                                        <ChevronDown className="h-4 w-4" />
+                                        <span>1 File</span>
+                                    </div>
+                                    <Button size="sm" variant="outline">
+                                        Review
+                                    </Button>
+                                </StateHead>
+                                <StateContent className="px-1">
+                                    <StateItem className="flex-row" title="File-1.txt">
+                                        <span>File-1.txt</span>
+                                        <div className="flex flex-row gap-1">
+                                            <span className="text-green-600">+2</span>
+                                            <span className="text-red-600">-1</span>
+                                        </div>
+                                    </StateItem>
+                                </StateContent>
+                            </>
+                        ) : (
+                            <StateHead className="flex-row p-1" onClick={() => setStateIsOpen(true)}>
+                                <div className="items-center flex flex-1 flex-row gap-2">
+                                    <ChevronRight className="h-4 w-4" />
+                                    <span>State</span>
+                                </div>
+                                <Button size="sm" variant="outline">
+                                    Review
+                                </Button>
+                            </StateHead>
+                        )}
+                        <Chatbox model="GPT-5.6 Sol Medium" />
+                    </State>
+                ) : (
+                    <Chatbox model="GPT-5.6 Sol Medium" />
+                )}
             </div>
         </div>
     )

@@ -14,15 +14,19 @@ import { PanelRightOpenIcon } from '@/app/assets/icons/panel-right-open'
 import { ApplicationContent, ApplicationShell } from '@/components/app/application-shell'
 import { Chatbox } from '@/components/app/chatbox'
 import { MessageContent } from '@/components/app/message-content'
+import { State, StateContent, StateHead, StateItem } from '@/components/app/state'
 import { ThoughtBlock } from '@/components/app/thought-block'
 import Threads from '@/components/app/threads'
 import { useThreads } from '@/components/app/threads-context'
+
+import { ChevronDown } from '@/components/icons/ChevronDown'
+import { ChevronRight } from '@/components/icons/ChevronRight'
 
 import { Button } from '@/components/ui/button'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
-import { MessageAction } from '@/data/messages'
+import { CodeChange, MessageAction } from '@/data/messages'
 import { Thread } from '@/data/threads'
 
 const ACTION_ICONS: Record<NonNullable<MessageAction['icon']>, React.ComponentType<any>> = {
@@ -67,6 +71,27 @@ function formatThoughtDuration(ms: number) {
     return `Thought for ${seconds} second${seconds === 1 ? '' : 's'}`
 }
 
+// Count added/removed lines from a unified-diff string, ignoring +++/--- headers.
+function countDiff(code: string): { added: number; removed: number } {
+    let added = 0
+    let removed = 0
+    for (const line of code.split('\n')) {
+        if (line.startsWith('+') && !line.startsWith('+++')) added++
+        else if (line.startsWith('-') && !line.startsWith('---')) removed++
+    }
+    return { added, removed }
+}
+
+function fileDiffTotals(change: CodeChange): { added: number; removed: number } {
+    return change.files.reduce(
+        (totals, file) => {
+            const c = countDiff(file.code)
+            return { added: totals.added + c.added, removed: totals.removed + c.removed }
+        },
+        { added: 0, removed: 0 }
+    )
+}
+
 interface PageProps {
     params: Promise<{ threadId: string }>
 }
@@ -84,6 +109,15 @@ function Page({ params }: PageProps) {
     const threadThinking = thinking[threadId] ?? null
     const lastMessage = threadMessages[threadMessages.length - 1]
     const latestAgentMessageId = lastMessage?.role === 'agent' ? lastMessage.id : undefined
+
+    // The latest prepared file changes in this thread, surfaced as docked state
+    // above the composer (the `State` pattern). "Current folder state is what
+    // gets published", so this always references the most recent change set.
+    const latestCodeChange: CodeChange | undefined = [...threadMessages]
+        .reverse()
+        .flatMap((message) => Object.values(message.code_changes ?? {}))[0]
+    const hasPreparedChange = !!latestCodeChange && latestCodeChange.files.length > 0
+    const [stateOpen, setStateOpen] = useState(true)
 
     const [showAutomationPanel, setShowAutomationPanel] = useState(false)
     const [showIncidentPanel, setShowIncidentPanel] = useState(false)
@@ -370,11 +404,69 @@ function Page({ params }: PageProps) {
                                 <div className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] bottom-0 sticky">
                                     <div className="bg-gradient-to-t from-[rgb(255,255,255)] dark:from-[rgb(17,23,28)] to-transparent h-6 inset-x-0 pointer-events-none absolute -top-6" />
                                     <div className="max-w-3xl mx-auto pb-6">
-                                        <Chatbox
-                                            className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)]"
-                                            onSubmit={handleSubmit}
-                                            showModelSelection={false}
-                                        />
+                                        {hasPreparedChange && latestCodeChange ? (
+                                            // Docked file-change state above the composer. Reflects
+                                            // the latest prepared change set; Review opens it in the
+                                            // side panel. Collapsible via the head chevron.
+                                            <State className="text-[13px] gap-1">
+                                                {stateOpen ? (
+                                                    <>
+                                                        <StateHead className="flex-row p-1" onClick={() => setStateOpen(false)}>
+                                                            <div className="items-center flex flex-1 flex-row gap-2">
+                                                                <ChevronDown className="h-4 w-4" />
+                                                                <span>{latestCodeChange.files.length} {latestCodeChange.files.length === 1 ? 'File' : 'Files'}</span>
+                                                                <span className="flex font-semibold gap-1 text-xs">
+                                                                    <span className="text-[rgb(39,124,67)]">+{fileDiffTotals(latestCodeChange).added}</span>
+                                                                    <span className="text-[rgb(200,45,76)]">-{fileDiffTotals(latestCodeChange).removed}</span>
+                                                                </span>
+                                                            </div>
+                                                            <Button onClick={handleSidePanelOpen} size="sm" variant="outline">
+                                                                Review
+                                                            </Button>
+                                                        </StateHead>
+                                                        <StateContent className="px-1">
+                                                            {latestCodeChange.files.map((file) => {
+                                                                const counts = countDiff(file.code)
+                                                                return (
+                                                                    <StateItem className="flex-row items-center" key={file.filename} title={file.filename}>
+                                                                        <span className="flex-1 min-w-0 truncate">{file.filename}</span>
+                                                                        <div className="flex flex-row gap-1 text-xs font-semibold">
+                                                                            <span className="text-[rgb(39,124,67)]">+{counts.added}</span>
+                                                                            <span className="text-[rgb(200,45,76)]">-{counts.removed}</span>
+                                                                        </div>
+                                                                    </StateItem>
+                                                                )
+                                                            })}
+                                                        </StateContent>
+                                                    </>
+                                                ) : (
+                                                    <StateHead className="flex-row p-1" onClick={() => setStateOpen(true)}>
+                                                        <div className="items-center flex flex-1 flex-row gap-2">
+                                                            <ChevronRight className="h-4 w-4" />
+                                                            <span>{latestCodeChange.files.length} {latestCodeChange.files.length === 1 ? 'File' : 'Files'}</span>
+                                                            <span className="flex font-semibold gap-1 text-xs">
+                                                                <span className="text-[rgb(39,124,67)]">+{fileDiffTotals(latestCodeChange).added}</span>
+                                                                <span className="text-[rgb(200,45,76)]">-{fileDiffTotals(latestCodeChange).removed}</span>
+                                                            </span>
+                                                        </div>
+                                                        <Button onClick={handleSidePanelOpen} size="sm" variant="outline">
+                                                            Review
+                                                        </Button>
+                                                    </StateHead>
+                                                )}
+                                                <Chatbox
+                                                    className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)]"
+                                                    onSubmit={handleSubmit}
+                                                    showModelSelection={false}
+                                                />
+                                            </State>
+                                        ) : (
+                                            <Chatbox
+                                                className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)]"
+                                                onSubmit={handleSubmit}
+                                                showModelSelection={false}
+                                            />
+                                        )}
                                     </div>
                                 </div>
                             </div>
