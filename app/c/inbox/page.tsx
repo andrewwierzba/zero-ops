@@ -2,8 +2,8 @@
 
 import { format, isValid } from 'date-fns'
 
-import { CircleIcon, CloseIcon, ReplyIcon, SlidersIcon } from '@/lib/icons'
-import { ArchiveIcon, ArrowUpIcon, EllipsisVerticalIcon, FunnelIcon, MicIcon } from 'lucide-react'
+import { ChevronDownIcon, CircleIcon, CloseIcon, PlusIcon, ReplyIcon, SlidersIcon } from '@/lib/icons'
+import { ArchiveIcon, ArrowUpIcon, EllipsisVerticalIcon, MicIcon } from 'lucide-react'
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -82,14 +82,12 @@ function ThreadsTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
                     <TableHead className="w-full">Insight</TableHead>
                     <TableHead>Severity</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Updated</TableHead>
                     <TableHead>Reported</TableHead>
                     <TableHead />
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {rows.map((row) => {
-                    const updatedTitle = formatFullLocale(row.updated_at)
                     const reportedTitle = formatFullLocale(row.created_at)
                     return (
                     <TableRow className="cursor-pointer" key={row.id} onClick={() => onSelect(row.id)}>
@@ -105,14 +103,6 @@ function ThreadsTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
                                     {row.status && <span className={`${StatusMetadata[row.status].iconClass} rounded-full block size-2`} />}
                                 </span>
                                 <span className="min-w-0 truncate">{row.status ? StatusMetadata[row.status].label : 'Training'}</span>
-                            </span>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground w-[1%] max-w-[7.5rem] whitespace-nowrap tabular-nums">
-                            <span
-                                className="block cursor-default truncate text-left"
-                                title={updatedTitle === '—' ? undefined : updatedTitle}
-                            >
-                                {formatRelativeSince(row.updated_at)}
                             </span>
                         </TableCell>
                         <TableCell className="text-muted-foreground w-[1%] max-w-[7.5rem] whitespace-nowrap tabular-nums">
@@ -252,7 +242,7 @@ function Page() {
             <DropdownMenuTrigger
                 render={
                     <Button className="rounded-full text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] text-[13px] leading-[20px]" variant="outline">
-                        <FunnelIcon className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] size-4" />
+                        <SlidersIcon className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] size-4" />
                         Filter
                         {activeFilterCount > 0 && (
                             <span className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] text-[12px] leading-[18px]">
@@ -323,9 +313,9 @@ function Page() {
                                         aria-label="ZeroOps configuration"
                                         className="rounded-[4px] text-[13px] leading-[20px]"
                                         onClick={handleConfigure}
+                                        size="sm"
                                         variant="outline"
                                     >
-                                        <SlidersIcon className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
                                         <span>Configuration</span>
                                     </Button>
                                 </div>
@@ -333,13 +323,29 @@ function Page() {
 
                             <div className="flex flex-col gap-6">
                                 <div className="flex flex-col gap-3">
-                                    <InputGroup className="border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)] rounded-full text-[13px] leading-[20px] min-h-10 pr-0.5">
+                                    <InputGroup className="border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)] rounded-full text-[13px] leading-[20px] min-h-10 has-[[data-slot=input-group-control]:focus-visible]:ring-[rgb(34,114,180)]/20 px-0.5">
+                                        <InputGroupAddon align="inline-start">
+                                            <Button
+                                                aria-label="Add context"
+                                                className="rounded-full"
+                                                size="icon-sm"
+                                                variant="ghost"
+                                            >
+                                                <PlusIcon />
+                                            </Button>
+                                        </InputGroupAddon>
+
                                         <InputGroupInput
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             placeholder="Ask ZeroOps…"
                                             value={searchQuery}
                                         />
+
                                         <InputGroupAddon align="inline-end">
+                                            <Button size="sm" variant="ghost">
+                                                <span>Opus 5 <span className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]">High</span></span>
+                                                <ChevronDownIcon />
+                                            </Button>
                                             <Button
                                                 aria-label={searchQuery ? 'search' : 'record'}
                                                 className="rounded-full"
