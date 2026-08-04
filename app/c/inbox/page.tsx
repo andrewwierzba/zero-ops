@@ -27,7 +27,6 @@ type ThreadStatus = NonNullable<Thread['status']>
 type ThreadSeverity = NonNullable<Thread['severity']>
 
 const StatusMetadata: Record<ThreadStatus, { iconClass: string; badgeClass: string; label: string; }> = {
-    investigating: { badgeClass: 'bg-[rgb(200,45,76)]/5', iconClass: 'bg-[rgb(200,45,76)]', label: 'Investigating' },
     not_an_issue: { badgeClass: 'bg-[rgb(111,111,111)]/5', iconClass: 'bg-[rgb(111,111,111)]', label: 'Not an issue' },
     open: { badgeClass: 'bg-[rgb(190,80,30)]/5', iconClass: 'bg-[rgb(190,80,30)]', label: 'Open' },
     resolved: { badgeClass: 'bg-[rgb(39,124,67)]/5', iconClass: 'bg-[rgb(39,124,67)]', label: 'Resolved' },
@@ -150,7 +149,7 @@ type FilterState = {
 }
 
 const SEVERITY_OPTIONS: ThreadSeverity[] = ['minor', 'moderate', 'critical']
-const STATUS_OPTIONS: ThreadStatus[] = ['investigating', 'not_an_issue', 'open', 'resolved']
+const STATUS_OPTIONS: ThreadStatus[] = ['not_an_issue', 'open', 'resolved']
 
 /** `Open`, `Open or Resolved`, `Not an issue, Open, or Resolved` */
 const orList = new Intl.ListFormat('en', { type: 'disjunction' })

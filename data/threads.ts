@@ -3,7 +3,7 @@ export interface Thread {
     archived_at?: string
     label: string
     severity?: 'minor' | 'moderate' | 'critical'
-    status?: 'investigating' | 'not_an_issue' | 'open' | 'resolved'
+    status?: 'not_an_issue' | 'open' | 'resolved'
     type?: 'automation' | 'incident'
     impact_assets?: string[]
     progress_updates?: { description: string; detail?: string; status: 'completed' | 'current' | 'pending'; timestamp: string }[]
@@ -21,7 +21,7 @@ export const defaultThreads: Thread[] = [
         label: 'Fan interaction enrichment falling behind real-time demand',
         created_at: '2026-04-20T14:45:00+00:00',
         severity: 'critical',
-        status: 'investigating',
+        status: 'open',
         type: 'incident',
         impact_assets: ['fan_interaction_enrichment', 'stadium_visualization_sink', 'fan_profile_enrichment', 'mobile_push_personalization', 'seat_upgrade_recommendations'],
         progress_updates: [
@@ -83,7 +83,7 @@ export const defaultThreads: Thread[] = [
         label: 'etl_orders_nightly failing with shuffle FetchFailedException retries',
         created_at: '2026-04-20T10:10:00+00:00',
         severity: 'critical',
-        status: 'investigating',
+        status: 'open',
         type: 'incident',
         impact_assets: ['etl_orders_nightly', 'report_orders_daily'],
         progress_updates: [
@@ -102,7 +102,7 @@ export const defaultThreads: Thread[] = [
         label: '3 claims processing jobs failing due to schema drift',
         created_at: '2026-04-20T10:00:00+00:00',
         severity: 'critical',
-        status: 'investigating',
+        status: 'open',
         type: 'incident',
         impact_assets: ['etl_claims_daily', 'etl_claims_enrichment', 'report_claims_summary'],
         progress_updates: [
@@ -183,7 +183,7 @@ export const defaultThreads: Thread[] = [
         label: 'Customer 360 failing: upstream table dropped',
         created_at: '2026-04-20T09:00:00+00:00',
         severity: 'critical',
-        status: 'investigating',
+        status: 'open',
         type: 'incident',
         impact_assets: ['report_customer_360', 'etl_marketing_events', 'ml_churn_scoring'],
         progress_updates: [

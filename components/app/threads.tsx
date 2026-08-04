@@ -36,7 +36,6 @@ type SortBy = 'updated_at' | 'created_at'
 type ThreadStatus = NonNullable<Thread['status']>
 
 const STATUS_DOT_CLASS: Record<ThreadStatus, string> = {
-    investigating: 'bg-[rgb(200,45,76)]',
     not_an_issue: 'bg-[rgb(111,111,111)]',
     open: 'bg-[rgb(190,80,30)]',
     resolved: 'bg-[rgb(39,124,67)]',

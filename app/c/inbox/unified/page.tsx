@@ -32,7 +32,7 @@ import { Thread } from '@/data/threads'
 type RowKind = 'insight' | 'automation_run'
 
 // A single State column spans both lifecycles: insight statuses and run states.
-type RowState = 'open' | 'investigating' | 'resolved' | 'not_an_issue' | 'completed' | 'running' | 'failed'
+type RowState = 'open' | 'resolved' | 'not_an_issue' | 'completed' | 'running' | 'failed'
 type Severity = NonNullable<Thread['severity']>
 
 const KIND_META: Record<RowKind, { label: string }> = {
@@ -42,7 +42,6 @@ const KIND_META: Record<RowKind, { label: string }> = {
 
 const STATE_META: Record<RowState, { dotClass: string; label: string }> = {
     open: { dotClass: 'bg-[rgb(190,80,30)]', label: 'Open' },
-    investigating: { dotClass: 'bg-[rgb(200,45,76)]', label: 'Investigating' },
     resolved: { dotClass: 'bg-[rgb(39,124,67)]', label: 'Resolved' },
     not_an_issue: { dotClass: 'bg-[rgb(111,111,111)]', label: 'Not an issue' },
     completed: { dotClass: 'bg-[rgb(39,124,67)]', label: 'Completed' },
@@ -208,7 +207,7 @@ type FilterState = {
 
 const KIND_OPTIONS: RowKind[] = ['insight', 'automation_run']
 const SEVERITY_OPTIONS: Severity[] = ['critical', 'moderate', 'minor']
-const STATE_OPTIONS: RowState[] = ['open', 'investigating', 'resolved', 'not_an_issue', 'completed', 'running', 'failed']
+const STATE_OPTIONS: RowState[] = ['open', 'resolved', 'not_an_issue', 'completed', 'running', 'failed']
 
 /** `Open`, `Open or Resolved`, `Not an issue, Open, or Resolved` */
 const orList = new Intl.ListFormat('en', { type: 'disjunction' })
