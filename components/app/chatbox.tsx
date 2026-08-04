@@ -2,12 +2,16 @@ import { ArrowUpIcon, ChevronDownIcon, MicIcon, PlusIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
+import { Stop } from '@/components/icons/Stop'
+
 import { Button } from '@/components/ui/button'
 
-export function Chatbox({ className, mode = "Agent", model = "claude-4.6-sonnet-medium", onSubmit, placeholder = "Plan, @ for context, / for commands", showModelSelection = true, ...props }: Omit<React.HTMLAttributes<HTMLDivElement>, 'onSubmit'> & {
+export function Chatbox({ className, isRunning = false, mode = "Agent", model = "claude-4.6-sonnet-medium", onStop, onSubmit, placeholder = "Plan, @ for context, / for commands", showModelSelection = true, ...props }: Omit<React.HTMLAttributes<HTMLDivElement>, 'onSubmit'> & {
     className?: string,
+    isRunning?: boolean,
     mode?: string,
     model?: string,
+    onStop?: () => void,
     onSubmit?: (prompt: string) => void,
     placeholder?: string,
     showModelSelection?: boolean
@@ -30,8 +34,8 @@ export function Chatbox({ className, mode = "Agent", model = "claude-4.6-sonnet-
         <div
             aria-label="chatbox"
             className={cn(
-                "bg-background border rounded-lg shadow-lg flex flex-col text-sm gap-3 max-h-full p-4",
-                isFocused ? "border-blue-600" : "border-neutral-200 dark:border-neutral-800",
+                "bg-background border rounded-xl shadow-lg flex flex-col text-sm gap-3 max-h-full p-4",
+                isFocused ? "border-neutral-300 dark:border-neutral-700" : "border-neutral-200 dark:border-neutral-800",
                 className
             )}
             {...props}
@@ -70,51 +74,61 @@ export function Chatbox({ className, mode = "Agent", model = "claude-4.6-sonnet-
                 <div className="flex gap-1 min-w-0">
                     <Button
                         aria-label="add-attachment"
-                        size="icon-sm"
+                        size="icon"
                         variant="ghost"
                     >
                         <PlusIcon />
                     </Button>
-                    {showModelSelection && (
-                        <Button
-                            aria-label="select-model"
-                            className="min-w-0 shrink"
-                            size="sm"
-                            variant="ghost"
-                        >
-                            <span className="truncate">{model}</span>
-                            <ChevronDownIcon />
-                        </Button>
-                    )}
                     <Button
                         aria-label="select mode"
                         className="min-w-0 shrink"
-                        size="sm"
                         variant="ghost"
                     >
                         <span className="truncate">{mode}</span>
                         <ChevronDownIcon />
                     </Button>
                 </div>
-                <div>
-                    {isFocused ? (
+                <div className="flex gap-1 min-w-0">
+                    {showModelSelection && (
                         <Button
-                            aria-label="send"
-                            className="rounded-full"
-                            onClick={submit}
-                            size="icon-sm"
+                            aria-label="select-model"
+                            className="min-w-0 shrink"
+                            variant="ghost"
                         >
-                            <ArrowUpIcon />
-                        </Button>
-                    ) : (
-                        <Button
-                            aria-label="record"
-                            className="rounded-full"
-                            size="icon-sm"
-                        >
-                            <MicIcon />
+                            <span className="truncate">{model}</span>
+                            <ChevronDownIcon />
                         </Button>
                     )}
+
+                    {
+                        isRunning ? (
+                            <Button
+                                aria-label="stop"
+                                className="rounded-full"
+                                onClick={onStop}
+                                size="icon"
+                            >
+                                <Stop />
+                            </Button>
+                        ) : isFocused ? (
+                            <Button
+                                aria-label="send"
+                                className="rounded-full"
+                                onClick={submit}
+                                size="icon"
+                            >
+                                <ArrowUpIcon />
+                            </Button>
+                        ) : (
+                            <Button
+                                aria-label="record"
+                                className="rounded-full"
+                                size="icon"
+                            >
+                                <MicIcon />
+                            </Button>
+                        )
+                    }
                 </div>
             </div>
         </div>

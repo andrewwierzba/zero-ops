@@ -8,7 +8,7 @@ const bubbleVariants = cva(
         variants: {
             variant: {
                 default: "bg-blue-600 text-white",
-                secondary: "bg-gray-100",
+                secondary: "bg-neutral-100 dark:bg-neutral-800",
             },
         },
         defaultVariants: {
