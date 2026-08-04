@@ -12,6 +12,7 @@ export { ChevronDoubleLeft as ChevronDoubleLeftIcon } from '@/components/icons/C
 export { ChevronDoubleRight as ChevronDoubleRightIcon } from '@/components/icons/ChevronDoubleRight'
 export { ChevronDown as ChevronDownIcon } from '@/components/icons/ChevronDown'
 export { ChevronRight as ChevronRightIcon } from '@/components/icons/ChevronRight'
+export { Circle as CircleIcon } from '@/components/icons/Circle'
 export { Clock as ClockIcon } from '@/components/icons/Clock'
 export { Close as CloseIcon } from '@/components/icons/Close'
 export { CloudDatabase as CloudDatabaseIcon } from '@/components/icons/CloudDatabase'
