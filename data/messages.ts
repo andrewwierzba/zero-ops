@@ -1183,4 +1183,94 @@ Each change passed code review individually. The performance cliff came from the
             },
         ],
     },
+    // ── Automation-run threads ───────────────────────────────────────────────
+    // Each scheduled run's agent response. Rendered by /c/[threadId] when a run
+    // row in the unified inbox is opened.
+    {
+        threadId: 'run-0001',
+        messages: [
+            {
+                actions: defaultAgentActions,
+                content: `**Nightly SLA freshness watcher** ran at 2:00 AM across 12 tables in scope.
+
+## Result
+- **11 of 12 tables** refreshed within their freshness SLA.
+- **1 table flagged:** [[table:sales_daily_report|#]] refreshed at 10:07 AM, breaching its 9:00 AM SLA.
+
+I opened a separate insight for the breach so it can be triaged: *"Sales dashboard data arriving late."*
+
+Next run scheduled for tomorrow at 2:00 AM.`,
+                created_at: '2026-04-20T02:00:00+00:00',
+                id: 'msg-run-0001-01',
+                role: 'agent',
+                thought_duration_ms: 18000,
+            },
+        ],
+    },
+    {
+        threadId: 'run-0002',
+        messages: [
+            {
+                actions: defaultAgentActions,
+                content: `**Schema drift monitor** ran at 3:00 PM against tables tagged \`claims\`.
+
+## Result
+- Scanned **8 tables**, compared live schemas against the last known-good snapshot.
+- **1 drift detected:** [[column:policyholder_id]] on [[table:claims_raw|#]] changed from INT to STRING.
+
+This drift is the root cause behind the active insight *"3 claims processing jobs failing due to schema drift."*
+
+Next run scheduled in 1 hour.`,
+                created_at: '2026-04-20T15:00:00+00:00',
+                id: 'msg-run-0002-01',
+                role: 'agent',
+                thought_duration_ms: 12000,
+            },
+        ],
+    },
+    {
+        threadId: 'run-0003',
+        messages: [
+            {
+                actions: defaultAgentActions,
+                content: `**Deprecated runtime scanner** is running now — checking all jobs for end-of-support Databricks Runtime versions.
+
+## In progress
+- Scanned **34 of 52 jobs** so far.
+- **4 jobs** found on DBR 14.3 (end-of-support May 1); reviewing breaking changes before recommending upgrades.
+
+I'll post a summary here when the scan completes.`,
+                created_at: '2026-04-20T15:20:00+00:00',
+                id: 'msg-run-0003-01',
+                role: 'agent',
+                thought_duration_ms: 9000,
+            },
+        ],
+    },
+    {
+        threadId: 'run-0004',
+        messages: [
+            {
+                actions: defaultAgentActions,
+                content: `**Cost anomaly sweep** failed at 11:30 AM before completing.
+
+## Error
+The run could not read billing usage — the query against \`system.billing.usage\` returned:
+
+\`\`\`
+[INSUFFICIENT_PERMISSIONS] User does not have SELECT on table 'system.billing.usage'.
+\`\`\`
+
+## Recommended fix
+Grant the automation's run-as principal \`SELECT\` on \`system.billing.usage\`, then re-run. No cost data was analyzed this run.`,
+                created_at: '2026-04-20T11:30:00+00:00',
+                id: 'msg-run-0004-01',
+                role: 'agent',
+                suggestions: [
+                    { label: 'Retry run' },
+                ],
+                thought_duration_ms: 6000,
+            },
+        ],
+    },
 ]
