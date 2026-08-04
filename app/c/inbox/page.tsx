@@ -2,7 +2,7 @@
 
 import { format, isValid } from 'date-fns'
 
-import { ReplyIcon, SlidersIcon } from '@/lib/icons'
+import { CircleIcon, CloseIcon, ReplyIcon, SlidersIcon } from '@/lib/icons'
 import { ArchiveIcon, ArrowUpIcon, EllipsisVerticalIcon, FunnelIcon, MicIcon } from 'lucide-react'
 
 import { useRouter } from 'next/navigation'
@@ -78,7 +78,7 @@ function ThreadsTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
     return (
         <Table>
             <TableHeader>
-                <TableRow>
+                <TableRow className="hover:bg-transparent">
                     <TableHead className="w-full">Insight</TableHead>
                     <TableHead>Severity</TableHead>
                     <TableHead>Status</TableHead>
@@ -161,6 +161,27 @@ type FilterState = {
 const SEVERITY_OPTIONS: NonNullable<Thread['severity']>[] = ['minor', 'moderate', 'critical']
 const STATUS_OPTIONS: NonNullable<Thread['status']>[] = ['investigating', 'not_an_issue', 'open', 'resolved']
 
+/** `Open`, `Open or Resolved`, `Not an issue, Open, or Resolved` */
+const orList = new Intl.ListFormat('en', { type: 'disjunction' })
+
+function FilterChip({ field, onClear, values }: { field: string; onClear: () => void; values: string[] }) {
+    return (
+        <span className="items-center bg-background border border-border rounded-full flex text-[13px] leading-[20px] gap-1 h-8 pl-3 pr-1 dark:bg-input/30 dark:border-input">
+            <span className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]">{field} is</span>
+            <span className="text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)]">{orList.format(values)}</span>
+            <Button
+                aria-label={`Clear ${field} filter`}
+                className="rounded-full"
+                onClick={onClear}
+                size="icon-xs"
+                variant="ghost"
+            >
+                <CloseIcon className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
+            </Button>
+        </span>
+    )
+}
+
 function Page() {
     const router = useRouter()
     const { addThread, sendUserMessage, threads } = useThreads()
@@ -228,15 +249,19 @@ function Page() {
 
     const filterDropdown = (
         <DropdownMenu>
-            <DropdownMenuTrigger className="items-center flex gap-1.5 rounded-md px-1.5 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground">
-                <FunnelIcon className="size-3.5" />
-                Filter
-                {activeFilterCount > 0 && (
-                    <span className="flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                        {activeFilterCount}
-                    </span>
-                )}
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger
+                render={
+                    <Button className="rounded-full text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] text-[13px] leading-[20px]" variant="outline">
+                        <FunnelIcon className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] size-4" />
+                        Filter
+                        {activeFilterCount > 0 && (
+                            <span className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] text-[12px] leading-[18px]">
+                                {activeFilterCount}
+                            </span>
+                        )}
+                    </Button>
+                }
+            />
             <DropdownMenuContent align="end">
                 <DropdownMenuGroup>
                     <DropdownMenuLabel>Severity</DropdownMenuLabel>
@@ -246,7 +271,7 @@ function Page() {
                             checked={filter.severities.includes(val)}
                             onCheckedChange={() => toggleSeverity(val)}
                         >
-                            {val.charAt(0).toUpperCase() + val.slice(1)}
+                            {SeverityLabel[val]}
                         </DropdownMenuCheckboxItem>
                     ))}
                 </DropdownMenuGroup>
@@ -259,7 +284,7 @@ function Page() {
                             checked={filter.statuses.includes(val)}
                             onCheckedChange={() => toggleStatus(val)}
                         >
-                            {val.charAt(0).toUpperCase() + val.slice(1)}
+                            {StatusMetadata[val].label}
                         </DropdownMenuCheckboxItem>
                     ))}
                 </DropdownMenuGroup>
@@ -288,77 +313,99 @@ function Page() {
                                 <div className="flex flex-col gap-3">
                                     <h1 className="text-2xl font-bold">Inbox</h1>
                                 </div>
-                                <Button
-                                    aria-label="ZeroOps configuration"
-                                    className="rounded-[4px] text-[13px] leading-[20px]"
-                                    onClick={handleConfigure}
-                                    variant="outline"
-                                >
-                                    <SlidersIcon className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
-                                    <span>Configuration</span>
-                                </Button>
+
+                                <div className="items-center flex gap-3">
+                                    <div className="items-center flex gap-1">
+                                        <CircleIcon className="text-[rgb(39,124,67)] dark:text-[rgb(59,166,94)] size-3" />
+                                        <span className="text-[13px] leading-[20px]">Active</span>
+                                    </div>
+                                    <Button
+                                        aria-label="ZeroOps configuration"
+                                        className="rounded-[4px] text-[13px] leading-[20px]"
+                                        onClick={handleConfigure}
+                                        variant="outline"
+                                    >
+                                        <SlidersIcon className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
+                                        <span>Configuration</span>
+                                    </Button>
+                                </div>
                             </div>
 
-                            <div className="flex flex-col gap-3">
-                                <InputGroup className="border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)] rounded-full text-[13px] leading-[20px] min-h-10 pr-0.5">
-                                    <InputGroupInput
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Ask ZeroOps…"
-                                        value={searchQuery}
-                                    />
-                                    <InputGroupAddon align="inline-end">
-                                        <Button
-                                            aria-label={searchQuery ? 'search' : 'record'}
-                                            className="rounded-full"
-                                            size="icon-sm"
-                                            variant="default"
-                                        >
-                                            {searchQuery ? <ArrowUpIcon /> : <MicIcon />}
-                                        </Button>
-                                    </InputGroupAddon>
-                                </InputGroup>
-
-                                <div className="flex flex-wrap gap-2 pt-1">
-                                    <svg
-                                        aria-hidden
-                                        className="absolute"
-                                        height="0"
-                                        width="0"
-                                    >
-                                        <defs>
-                                            <linearGradient
-                                                gradientUnits="userSpaceOnUse"
-                                                id="reply-icon-gradient"
-                                                x1="-1.16831"
-                                                x2="12.4619"
-                                                y1="1.18452"
-                                                y2="18.6312"
+                            <div className="flex flex-col gap-6">
+                                <div className="flex flex-col gap-3">
+                                    <InputGroup className="border-[rgb(203,203,203)] dark:border-[rgb(55,68,79)] rounded-full text-[13px] leading-[20px] min-h-10 pr-0.5">
+                                        <InputGroupInput
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            placeholder="Ask ZeroOps…"
+                                            value={searchQuery}
+                                        />
+                                        <InputGroupAddon align="inline-end">
+                                            <Button
+                                                aria-label={searchQuery ? 'search' : 'record'}
+                                                className="rounded-full"
+                                                size="icon-sm"
+                                                variant="default"
                                             >
-                                                <stop offset="0.235" stopColor="#4299E0" />
-                                                <stop offset="0.47" stopColor="#CA42E0" />
-                                                <stop offset="0.76" stopColor="#FF5F46" />
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
+                                                {searchQuery ? <ArrowUpIcon /> : <MicIcon />}
+                                            </Button>
+                                        </InputGroupAddon>
+                                    </InputGroup>
 
-                                    <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none text-[13px] leading-[20px] gap-1.5 w-fit" variant="secondary">
-                                        <ReplyIcon
-                                            className="size-3.5 [&_path]:[stroke:url(#reply-icon-gradient)]"
-                                        />
-                                        <span>What can ZeroOps do?</span>
-                                    </Button>
-                                    <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none text-[13px] leading-[20px] gap-1.5 w-fit" variant="secondary">
-                                        <ReplyIcon
-                                            className="size-3.5 [&_path]:[stroke:url(#reply-icon-gradient)]"
-                                        />
-                                        <span>Configure ZeroOps</span>
-                                    </Button>
+                                    <div className="flex flex-wrap gap-2 pt-1">
+                                        <svg
+                                            aria-hidden
+                                            className="absolute"
+                                            height="0"
+                                            width="0"
+                                        >
+                                            <defs>
+                                                <linearGradient
+                                                    gradientUnits="userSpaceOnUse"
+                                                    id="reply-icon-gradient"
+                                                    x1="-1.16831"
+                                                    x2="12.4619"
+                                                    y1="1.18452"
+                                                    y2="18.6312"
+                                                >
+                                                    <stop offset="0.235" stopColor="#4299E0" />
+                                                    <stop offset="0.47" stopColor="#CA42E0" />
+                                                    <stop offset="0.76" stopColor="#FF5F46" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+
+                                        <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-full text-[13px] font-normal leading-[20px] gap-1.5 w-fit" variant="secondary">
+                                            <ReplyIcon
+                                                className="size-4 [&_path]:[fill:url(#reply-icon-gradient)]"
+                                            />
+                                            <span>What can ZeroOps do?</span>
+                                        </Button>
+                                        <Button className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-full text-[13px] font-normal leading-[20px] gap-1.5 w-fit" variant="secondary">
+                                            <ReplyIcon
+                                                className="size-4 [&_path]:[fill:url(#reply-icon-gradient)]"
+                                            />
+                                            <span>Configure ZeroOps</span>
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 <section className="flex flex-col gap-2">
-                                    <div className="flex items-center justify-between">
-                                        <h2 className="text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] text-[13px] font-bold leading-[20px]">Insights</h2>
+                                    <div className="flex flex-wrap items-center gap-2">
                                         {filterDropdown}
+                                        {filter.severities.length > 0 && (
+                                            <FilterChip
+                                                field="Severity"
+                                                onClear={() => setFilter((prev) => ({ ...prev, severities: [] }))}
+                                                values={filter.severities.map((val) => SeverityLabel[val])}
+                                            />
+                                        )}
+                                        {filter.statuses.length > 0 && (
+                                            <FilterChip
+                                                field="Status"
+                                                onClear={() => setFilter((prev) => ({ ...prev, statuses: [] }))}
+                                                values={filter.statuses.map((val) => StatusMetadata[val].label)}
+                                            />
+                                        )}
                                     </div>
                                     <ThreadsTable emptyLabel="No active threads" onSelect={(id) => router.push(`/c/${id}`)} rows={filterThreads(activeThreads)} />
                                 </section>

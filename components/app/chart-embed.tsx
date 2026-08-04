@@ -32,7 +32,7 @@ function ChartCanvas({ chart }: { chart: ChartDef }) {
 
     return (
         <ChartContainer
-            className="aspect-auto bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] border border-neutral-200 dark:border-neutral-800 rounded-lg h-[200px] p-4 w-full"
+            className="aspect-auto bg-[rgb(247,247,247)] dark:bg-[rgb(31,39,45)] h-[200px] p-4 w-full"
             config={config}
         >
             <AreaChart data={chart.data} margin={{ left: 0, right: 8, top: 8 }}>
