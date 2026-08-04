@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useRef, useState } from 'react'
 
 import { Agent, defaultAgents } from '@/data/agents'
 import { defaultMessages, Message } from '@/data/messages'
@@ -23,6 +23,7 @@ interface ThreadsContextValue {
     addThread: (thread: Thread) => void
     agents: Agent[]
     messages: Record<string, Message[]>
+    markThreadRead: (threadId: string) => void
     sendUserMessage: (threadId: string, content: string) => void
     setAgentActive: (agentId: string, active: boolean) => void
     thinking: Record<string, ThinkingState | null>
@@ -51,13 +52,12 @@ function ThreadsProvider({ children }: { children: React.ReactNode }) {
     // Mirror threads state so sendUserMessage can read scenario state even when
     // called in the same tick as addThread (before React commits the update).
     const threadsRef = useRef(threads)
-    threadsRef.current = threads
 
-    function setThreadsBoth(updater: (prev: Thread[]) => Thread[]) {
+    const setThreadsBoth = useCallback((updater: (prev: Thread[]) => Thread[]) => {
         const next = updater(threadsRef.current)
         threadsRef.current = next
         setThreads(next)
-    }
+    }, [])
 
     function addThread(thread: Thread) {
         setThreadsBoth((prev) => [thread, ...prev])
@@ -66,6 +66,15 @@ function ThreadsProvider({ children }: { children: React.ReactNode }) {
     function addAgent(agent: Agent) {
         setAgents((prev) => [agent, ...prev])
     }
+
+    const markThreadRead = useCallback((threadId: string) => {
+        const readAt = new Date().toISOString()
+        setThreadsBoth((prev) =>
+            prev.map((thread) =>
+                thread.id === threadId ? { ...thread, read_at: readAt } : thread
+            )
+        )
+    }, [setThreadsBoth])
 
     function setAgentActive(agentId: string, active: boolean) {
         setAgents((prev) => prev.map((a) => (a.id === agentId ? { ...a, active } : a)))
@@ -192,6 +201,7 @@ function ThreadsProvider({ children }: { children: React.ReactNode }) {
                 addMessage,
                 addThread,
                 agents,
+                markThreadRead,
                 messages,
                 sendUserMessage,
                 setAgentActive,

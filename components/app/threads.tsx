@@ -1,6 +1,6 @@
 'use client'
 
-import { ClockIcon, OverflowIcon, SearchIcon, SlidersIcon } from '@/lib/icons'
+import { CircleIcon, ClockIcon, OverflowIcon, SearchIcon, SlidersIcon } from '@/lib/icons'
 import { InboxIcon, SquarePenIcon } from 'lucide-react'
 
 import { usePathname, useRouter } from 'next/navigation'
@@ -36,10 +36,10 @@ type SortBy = 'updated_at' | 'created_at'
 type ThreadStatus = NonNullable<Thread['status']>
 
 const STATUS_DOT_CLASS: Record<ThreadStatus, string> = {
-    investigating: 'bg-[rgb(200,45,76)]',
-    not_an_issue: 'bg-[rgb(111,111,111)]',
-    open: 'bg-[rgb(190,80,30)]',
-    resolved: 'bg-[rgb(39,124,67)]',
+    investigating: 'text-[rgb(200,45,76)]',
+    not_an_issue: 'text-[rgb(111,111,111)]',
+    open: 'text-[rgb(190,80,30)]',
+    resolved: 'text-[rgb(39,124,67)]',
 }
 
 interface ThreadsProps {
@@ -52,6 +52,9 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
     const router = useRouter()
     const { threads, addThread } = useThreads()
     const [sortBy, setSortBy] = useState<SortBy>('updated_at')
+    const unreadInsightCount = threads.filter(
+        (thread) => thread.type === 'incident' && !thread.archived_at && !thread.read_at
+    ).length
 
     function isActive(href: string) {
         return pathname === href
@@ -133,6 +136,17 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                         >
                             <InboxIcon className="size-4 text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]" />
                             Inbox
+                            {unreadInsightCount > 0 && (
+                                <span className="items-center flex ml-auto">
+                                    <CircleIcon
+                                        aria-hidden
+                                        className="text-[rgb(34,114,180)] dark:text-[rgb(138,202,255)] size-3"
+                                    />
+                                    <span className="sr-only">
+                                        {unreadInsightCount} unread {unreadInsightCount === 1 ? 'insight' : 'insights'}
+                                    </span>
+                                </span>
+                            )}
                         </Button>
                     </div>
 
@@ -157,10 +171,18 @@ function Threads({ panelOpen, onToggle }: ThreadsProps) {
                                 onClick={() => router.push(`/c/${thread.id}`)}
                                 variant="ghost"
                             >
-                                <span className="shrink-0 size-2">
-                                    {thread.status && <span className={`rounded-full ${STATUS_DOT_CLASS[thread.status]} block size-2`} />}
+                                <span className="shrink-0 size-3">
+                                    {thread.status && (
+                                        <CircleIcon
+                                            aria-hidden
+                                            className={`${STATUS_DOT_CLASS[thread.status]} size-3`}
+                                        />
+                                    )}
                                 </span>
-                                <span className="text-[13px] font-normal text-left truncate w-full">{thread.label}</span>
+                                <span className={`text-[13px] text-left truncate w-full ${thread.read_at ? 'font-normal' : 'font-semibold'}`}>
+                                    {thread.label}
+                                    {!thread.read_at && <span className="sr-only"> (Unread)</span>}
+                                </span>
                                 <span aria-describedby="Last updated" className="text-muted-foreground text-xs mt-0.5">
                                     {formatRelativeTime(thread.updated_at)}
                                 </span>

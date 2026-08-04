@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 
 import { BugIcon, ChevronDoubleLeftIcon, CloseIcon, CopyIcon, ForkIcon, GearIcon, PlusIcon, ReplyIcon, ShareIcon, SyncIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
 
@@ -30,7 +30,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { CodeChange, MessageAction } from '@/data/messages'
 import { Thread } from '@/data/threads'
 
-const ACTION_ICONS: Record<NonNullable<MessageAction['icon']>, React.ComponentType<any>> = {
+const ACTION_ICONS: Record<NonNullable<MessageAction['icon']>, React.ComponentType<{ className?: string }>> = {
     thumbs_up: ThumbsUpIcon,
     thumbs_down: ThumbsDownIcon,
     regenerate: SyncIcon,
@@ -103,7 +103,11 @@ function Page({ params }: PageProps) {
     const [threadsOpen, setThreadsOpen] = useState(true)
     const threadsPanelRef = usePanelRef()
 
-    const { addThread, threads, messages, sendUserMessage, thinking } = useThreads()
+    const { addThread, markThreadRead, messages, sendUserMessage, thinking, threads } = useThreads()
+
+    useEffect(() => {
+        markThreadRead(threadId)
+    }, [markThreadRead, threadId])
 
     const searchParams = useSearchParams()
 
@@ -216,7 +220,9 @@ function Page({ params }: PageProps) {
                                 </Button>
 
                                 {/* Thread label */}
-                                <span className="text-[13px] font-semibold min-w-0 truncate">{thread?.label ?? threadId}</span>
+                                <span className={`text-[13px] min-w-0 truncate ${thread?.read_at ? 'font-normal' : 'font-semibold'}`}>
+                                    {thread?.label ?? threadId}
+                                </span>
                                 {thread?.type === 'incident' && (
                                     <>
                                         <span className="bg-muted rounded-sm text-muted-foreground inline-flex text-xs px-1.5 py-0.5">

@@ -7,6 +7,7 @@ export interface Thread {
     type?: 'automation' | 'incident'
     impact_assets?: string[]
     progress_updates?: { description: string; detail?: string; status: 'completed' | 'current' | 'pending'; timestamp: string }[]
+    read_at?: string
     reported_by?: string
     root_cause_summary?: string
     scenario_id?: string
@@ -15,7 +16,9 @@ export interface Thread {
     created_at: string
 }
 
-export const defaultThreads: Thread[] = [
+const initiallyUnreadThreadId = '11111111-0000-0000-0000-000000000012'
+
+const seededThreads: Thread[] = [
     {
         id: '11111111-0000-0000-0000-000000000012',
         label: 'Fan interaction enrichment falling behind real-time demand',
@@ -315,3 +318,7 @@ export const defaultThreads: Thread[] = [
         updated_at: '2026-04-20T11:30:00+00:00',
     },
 ]
+
+export const defaultThreads: Thread[] = seededThreads.map((thread) =>
+    thread.id === initiallyUnreadThreadId ? thread : { ...thread, read_at: thread.updated_at }
+)

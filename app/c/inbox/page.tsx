@@ -26,10 +26,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 type ThreadStatus = NonNullable<Thread['status']>
 
 const StatusMetadata: Record<ThreadStatus, { iconClass: string; badgeClass: string; label: string; }> = {
-    investigating: { badgeClass: 'bg-[rgb(200,45,76)]/5', iconClass: 'bg-[rgb(200,45,76)]', label: 'Investigating' },
-    not_an_issue: { badgeClass: 'bg-[rgb(111,111,111)]/5', iconClass: 'bg-[rgb(111,111,111)]', label: 'Not an issue' },
-    open: { badgeClass: 'bg-[rgb(190,80,30)]/5', iconClass: 'bg-[rgb(190,80,30)]', label: 'Open' },
-    resolved: { badgeClass: 'bg-[rgb(39,124,67)]/5', iconClass: 'bg-[rgb(39,124,67)]', label: 'Resolved' },
+    investigating: { badgeClass: 'bg-[rgb(200,45,76)]/5', iconClass: 'text-[rgb(200,45,76)]', label: 'Investigating' },
+    not_an_issue: { badgeClass: 'bg-[rgb(111,111,111)]/5', iconClass: 'text-[rgb(111,111,111)]', label: 'Not an issue' },
+    open: { badgeClass: 'bg-[rgb(190,80,30)]/5', iconClass: 'text-[rgb(190,80,30)]', label: 'Open' },
+    resolved: { badgeClass: 'bg-[rgb(39,124,67)]/5', iconClass: 'text-[rgb(39,124,67)]', label: 'Resolved' },
 }
 
 const SeverityLabel: Record<NonNullable<Thread['severity']>, string> = {
@@ -88,10 +88,19 @@ function ThreadsTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
             </TableHeader>
             <TableBody>
                 {rows.map((row) => {
+                    const insightNameColor = row.status === 'resolved' || row.status === 'not_an_issue'
+                        ? 'text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]'
+                        : 'text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)]'
                     const reportedTitle = formatFullLocale(row.created_at)
                     return (
                     <TableRow className="cursor-pointer" key={row.id} onClick={() => onSelect(row.id)}>
-                        <TableCell className="max-w-0 truncate">{row.label}</TableCell>
+                        <TableCell
+                            className={`max-w-0 truncate ${row.read_at ? 'font-normal' : 'font-semibold'} ${insightNameColor}`}
+                            title={row.label}
+                        >
+                            {row.label}
+                            {!row.read_at && <span className="sr-only"> (Unread)</span>}
+                        </TableCell>
                         <TableCell>
                             <span className="bg-muted rounded-sm text-muted-foreground inline-flex text-xs max-w-full px-1.5 py-0.5">
                                 <span className="min-w-0 truncate">{row.severity ? SeverityLabel[row.severity] : "Training"}</span>
@@ -99,8 +108,13 @@ function ThreadsTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
                         </TableCell>
                         <TableCell>
                             <span className="items-center bg-muted rounded-sm text-muted-foreground inline-flex text-xs max-w-full gap-1 px-1.5 py-0.5">
-                                <span className="shrink-0 size-2">
-                                    {row.status && <span className={`${StatusMetadata[row.status].iconClass} rounded-full block size-2`} />}
+                                <span className="shrink-0 size-3">
+                                    {row.status && (
+                                        <CircleIcon
+                                            aria-hidden
+                                            className={`${StatusMetadata[row.status].iconClass} size-3`}
+                                        />
+                                    )}
                                 </span>
                                 <span className="min-w-0 truncate">{row.status ? StatusMetadata[row.status].label : 'Training'}</span>
                             </span>
@@ -119,6 +133,7 @@ function ThreadsTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
                                     render={
                                         <Button
                                             aria-label="Archive"
+                                            onClick={(event) => event.stopPropagation()}
                                             size="icon-sm"
                                             variant="ghost"
                                         >
@@ -131,7 +146,12 @@ function ThreadsTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
                                     <span>Archive</span>
                                 </TooltipContent>
                             </Tooltip>
-                            <Button variant="ghost" size="icon-sm">
+                            <Button
+                                aria-label="More actions"
+                                onClick={(event) => event.stopPropagation()}
+                                size="icon-sm"
+                                variant="ghost"
+                            >
                                 <EllipsisVerticalIcon className="text-muted-foreground" />
                             </Button>
                         </TableCell>

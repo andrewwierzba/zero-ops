@@ -41,13 +41,13 @@ const KIND_META: Record<RowKind, { label: string }> = {
 }
 
 const STATE_META: Record<RowState, { dotClass: string; label: string }> = {
-    open: { dotClass: 'bg-[rgb(190,80,30)]', label: 'Open' },
-    investigating: { dotClass: 'bg-[rgb(200,45,76)]', label: 'Investigating' },
-    resolved: { dotClass: 'bg-[rgb(39,124,67)]', label: 'Resolved' },
-    not_an_issue: { dotClass: 'bg-[rgb(111,111,111)]', label: 'Not an issue' },
-    completed: { dotClass: 'bg-[rgb(39,124,67)]', label: 'Completed' },
-    running: { dotClass: 'bg-[rgb(34,114,180)]', label: 'Running' },
-    failed: { dotClass: 'bg-[rgb(200,45,76)]', label: 'Failed' },
+    open: { dotClass: 'text-[rgb(190,80,30)]', label: 'Open' },
+    investigating: { dotClass: 'text-[rgb(200,45,76)]', label: 'Investigating' },
+    resolved: { dotClass: 'text-[rgb(39,124,67)]', label: 'Resolved' },
+    not_an_issue: { dotClass: 'text-[rgb(111,111,111)]', label: 'Not an issue' },
+    completed: { dotClass: 'text-[rgb(39,124,67)]', label: 'Completed' },
+    running: { dotClass: 'text-[rgb(34,114,180)]', label: 'Running' },
+    failed: { dotClass: 'text-[rgb(200,45,76)]', label: 'Failed' },
 }
 
 const SeverityLabel: Record<Severity, string> = {
@@ -65,6 +65,7 @@ interface UnifiedRow {
     /** ISO timestamp of the row's latest activity (insight updated / run time). */
     date: string
     href: string
+    readAt?: string
 }
 
 // ── Automation-run stimulus data ─────────────────────────────────────────────
@@ -87,6 +88,7 @@ function threadToRow(t: Thread): UnifiedRow {
         state: (t.status ?? 'open') as RowState,
         date: t.updated_at,
         href: `/c/${t.id}`,
+        readAt: t.read_at,
     }
 }
 
@@ -143,9 +145,20 @@ function UnifiedTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
                 {rows.map((row) => {
                     const dateTitle = formatFullLocale(row.date)
                     const { label: kindLabel } = KIND_META[row.kind]
+                    const nameColor = row.kind === 'insight'
+                        ? row.state === 'resolved' || row.state === 'not_an_issue'
+                            ? 'text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)]'
+                            : 'text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)]'
+                        : ''
                     return (
                         <TableRow className="cursor-pointer" key={row.id} onClick={() => onSelect(row.href)}>
-                            <TableCell className="max-w-0 truncate">{row.name}</TableCell>
+                            <TableCell
+                                className={`max-w-0 truncate ${row.readAt ? 'font-normal' : 'font-semibold'} ${nameColor}`}
+                                title={row.kind === 'insight' ? row.name : undefined}
+                            >
+                                {row.name}
+                                {!row.readAt && <span className="sr-only"> (Unread)</span>}
+                            </TableCell>
                             <TableCell>
                                 <span className="bg-muted rounded-sm text-muted-foreground inline-flex text-xs max-w-full whitespace-nowrap px-1.5 py-0.5">
                                     <span className="min-w-0 truncate">{kindLabel}</span>
@@ -162,7 +175,10 @@ function UnifiedTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
                             </TableCell>
                             <TableCell>
                                 <span className="items-center bg-muted rounded-sm text-muted-foreground inline-flex text-xs max-w-full gap-1 px-1.5 py-0.5">
-                                    <span className={`${STATE_META[row.state].dotClass} rounded-full block shrink-0 size-2`} />
+                                    <CircleIcon
+                                        aria-hidden
+                                        className={`${STATE_META[row.state].dotClass} shrink-0 size-3`}
+                                    />
                                     <span className="min-w-0 truncate">{STATE_META[row.state].label}</span>
                                 </span>
                             </TableCell>
@@ -178,7 +194,12 @@ function UnifiedTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
                                 <Tooltip>
                                     <TooltipTrigger
                                         render={
-                                            <Button aria-label="Archive" size="icon-sm" variant="ghost">
+                                            <Button
+                                                aria-label="Archive"
+                                                onClick={(event) => event.stopPropagation()}
+                                                size="icon-sm"
+                                                variant="ghost"
+                                            >
                                                 <ArchiveIcon className="text-muted-foreground" />
                                                 <span className="sr-only">Archive thread</span>
                                             </Button>
@@ -188,7 +209,12 @@ function UnifiedTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
                                         <span>Archive</span>
                                     </TooltipContent>
                                 </Tooltip>
-                                <Button variant="ghost" size="icon-sm">
+                                <Button
+                                    aria-label="More actions"
+                                    onClick={(event) => event.stopPropagation()}
+                                    size="icon-sm"
+                                    variant="ghost"
+                                >
                                     <EllipsisVerticalIcon className="text-muted-foreground" />
                                 </Button>
                             </TableCell>
@@ -251,7 +277,11 @@ function Page() {
     const insightRows = threads
         .filter((t) => t.type === 'incident' && !t.archived_at)
         .map(threadToRow)
-    const allRows = [...insightRows, ...automationRuns].sort((a, b) =>
+    const automationRunRows = automationRuns.map((run) => ({
+        ...run,
+        readAt: threads.find((thread) => thread.id === run.id)?.read_at,
+    }))
+    const allRows = [...insightRows, ...automationRunRows].sort((a, b) =>
         (b.date ?? '').localeCompare(a.date ?? '')
     )
 
