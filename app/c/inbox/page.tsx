@@ -5,8 +5,8 @@ import { format, isValid } from 'date-fns'
 import { ChevronDownIcon, CircleIcon, CloseIcon, PlusIcon, ReplyIcon, SlidersIcon } from '@/lib/icons'
 import { ArchiveIcon, ArrowUpIcon, EllipsisVerticalIcon, MicIcon } from 'lucide-react'
 
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useState } from 'react'
 
 import { usePanelRef } from 'react-resizable-panels'
 
@@ -24,6 +24,7 @@ import { Thread } from '@/data/threads'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 type ThreadStatus = NonNullable<Thread['status']>
+type ThreadSeverity = NonNullable<Thread['severity']>
 
 const StatusMetadata: Record<ThreadStatus, { iconClass: string; badgeClass: string; label: string; }> = {
     investigating: { badgeClass: 'bg-[rgb(200,45,76)]/5', iconClass: 'bg-[rgb(200,45,76)]', label: 'Investigating' },
@@ -32,7 +33,7 @@ const StatusMetadata: Record<ThreadStatus, { iconClass: string; badgeClass: stri
     resolved: { badgeClass: 'bg-[rgb(39,124,67)]/5', iconClass: 'bg-[rgb(39,124,67)]', label: 'Resolved' },
 }
 
-const SeverityLabel: Record<NonNullable<Thread['severity']>, string> = {
+const SeverityLabel: Record<ThreadSeverity, string> = {
     minor: 'Minor',
     moderate: 'Moderate',
     critical: 'Critical',
@@ -144,12 +145,12 @@ function ThreadsTable({ emptyLabel, rows, onSelect }: { emptyLabel: string; rows
 }
 
 type FilterState = {
-    severities: NonNullable<Thread['severity']>[]
-    statuses: NonNullable<Thread['status']>[]
+    severities: ThreadSeverity[]
+    statuses: ThreadStatus[]
 }
 
-const SEVERITY_OPTIONS: NonNullable<Thread['severity']>[] = ['minor', 'moderate', 'critical']
-const STATUS_OPTIONS: NonNullable<Thread['status']>[] = ['investigating', 'not_an_issue', 'open', 'resolved']
+const SEVERITY_OPTIONS: ThreadSeverity[] = ['minor', 'moderate', 'critical']
+const STATUS_OPTIONS: ThreadStatus[] = ['investigating', 'not_an_issue', 'open', 'resolved']
 
 /** `Open`, `Open or Resolved`, `Not an issue, Open, or Resolved` */
 const orList = new Intl.ListFormat('en', { type: 'disjunction' })
@@ -172,11 +173,126 @@ function FilterChip({ field, onClear, values }: { field: string; onClear: () => 
     )
 }
 
+function isSeverity(value: string): value is ThreadSeverity {
+    return SEVERITY_OPTIONS.some((option) => option === value)
+}
+
+function isStatus(value: string): value is ThreadStatus {
+    return STATUS_OPTIONS.some((option) => option === value)
+}
+
+function FilteredThreads({ onSelect, threads }: { onSelect: (id: string) => void; threads: Thread[] }) {
+    const pathname = usePathname()
+    const router = useRouter()
+    const searchParams = useSearchParams()
+
+    const filter: FilterState = {
+        severities: [...new Set(searchParams.getAll('severity').filter(isSeverity))],
+        statuses: [...new Set(searchParams.getAll('status').filter(isStatus))],
+    }
+
+    function updateFilterParam(key: 'severity' | 'status', values: string[]) {
+        const nextSearchParams = new URLSearchParams(searchParams.toString())
+        nextSearchParams.delete(key)
+        values.forEach((value) => nextSearchParams.append(key, value))
+
+        const query = nextSearchParams.toString()
+        router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    }
+
+    function toggleSeverity(value: ThreadSeverity) {
+        updateFilterParam(
+            'severity',
+            filter.severities.includes(value)
+                ? filter.severities.filter((severity) => severity !== value)
+                : [...filter.severities, value],
+        )
+    }
+
+    function toggleStatus(value: ThreadStatus) {
+        updateFilterParam(
+            'status',
+            filter.statuses.includes(value)
+                ? filter.statuses.filter((status) => status !== value)
+                : [...filter.statuses, value],
+        )
+    }
+
+    const filteredThreads = threads
+        .filter((thread) => filter.severities.length === 0 || (thread.severity && filter.severities.includes(thread.severity)))
+        .filter((thread) => filter.statuses.length === 0 || (thread.status && filter.statuses.includes(thread.status)))
+
+    const activeFilterCount = filter.severities.length + filter.statuses.length
+
+    return (
+        <section className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+                <DropdownMenu>
+                    <DropdownMenuTrigger
+                        render={
+                            <Button className="rounded-full text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] text-[13px] leading-[20px]" variant="outline">
+                                <SlidersIcon className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] size-4" />
+                                Filter
+                                {activeFilterCount > 0 && (
+                                    <span className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] text-[12px] leading-[18px]">
+                                        {activeFilterCount}
+                                    </span>
+                                )}
+                            </Button>
+                        }
+                    />
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel>Severity</DropdownMenuLabel>
+                            {SEVERITY_OPTIONS.map((value) => (
+                                <DropdownMenuCheckboxItem
+                                    checked={filter.severities.includes(value)}
+                                    key={value}
+                                    onCheckedChange={() => toggleSeverity(value)}
+                                >
+                                    {SeverityLabel[value]}
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel>Status</DropdownMenuLabel>
+                            {STATUS_OPTIONS.map((value) => (
+                                <DropdownMenuCheckboxItem
+                                    checked={filter.statuses.includes(value)}
+                                    key={value}
+                                    onCheckedChange={() => toggleStatus(value)}
+                                >
+                                    {StatusMetadata[value].label}
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                {filter.severities.length > 0 && (
+                    <FilterChip
+                        field="Severity"
+                        onClear={() => updateFilterParam('severity', [])}
+                        values={filter.severities.map((value) => SeverityLabel[value])}
+                    />
+                )}
+                {filter.statuses.length > 0 && (
+                    <FilterChip
+                        field="Status"
+                        onClear={() => updateFilterParam('status', [])}
+                        values={filter.statuses.map((value) => StatusMetadata[value].label)}
+                    />
+                )}
+            </div>
+            <ThreadsTable emptyLabel="No active threads" onSelect={onSelect} rows={filteredThreads} />
+        </section>
+    )
+}
+
 function Page() {
     const router = useRouter()
     const { addThread, sendUserMessage, threads } = useThreads()
 
-    const [filter, setFilter] = useState<FilterState>({ severities: [], statuses: [] })
     const [searchQuery, setSearchQuery] = useState('')
     const [threadsOpen, setThreadsOpen] = useState(true)
 
@@ -196,32 +312,6 @@ function Page() {
         setThreadsOpen((o) => !o)
     }
 
-    function toggleSeverity(val: NonNullable<Thread['severity']>) {
-        setFilter((prev) => ({
-            ...prev,
-            severities: prev.severities.includes(val)
-                ? prev.severities.filter((s) => s !== val)
-                : [...prev.severities, val],
-        }))
-    }
-
-    function toggleStatus(val: NonNullable<Thread['status']>) {
-        setFilter((prev) => ({
-            ...prev,
-            statuses: prev.statuses.includes(val)
-                ? prev.statuses.filter((s) => s !== val)
-                : [...prev.statuses, val],
-        }))
-    }
-
-    function filterThreads(list: Thread[]) {
-        return list
-            .filter((t) => filter.severities.length === 0 || (t.severity && filter.severities.includes(t.severity)))
-            .filter((t) => filter.statuses.length === 0 || (t.status && filter.statuses.includes(t.status)))
-    }
-
-    const activeFilterCount = filter.severities.length + filter.statuses.length
-
     function handleConfigure() {
         const nowIso = new Date().toISOString()
         const thread: Thread = {
@@ -236,51 +326,6 @@ function Page() {
         sendUserMessage(thread.id, 'How is ZeroOps configured?')
         router.push(`/c/${thread.id}`)
     }
-
-    const filterDropdown = (
-        <DropdownMenu>
-            <DropdownMenuTrigger
-                render={
-                    <Button className="rounded-full text-[rgb(22,22,22)] dark:text-[rgb(232,236,240)] text-[13px] leading-[20px]" variant="outline">
-                        <SlidersIcon className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] size-4" />
-                        Filter
-                        {activeFilterCount > 0 && (
-                            <span className="text-[rgb(111,111,111)] dark:text-[rgb(146,164,179)] text-[12px] leading-[18px]">
-                                {activeFilterCount}
-                            </span>
-                        )}
-                    </Button>
-                }
-            />
-            <DropdownMenuContent align="end">
-                <DropdownMenuGroup>
-                    <DropdownMenuLabel>Severity</DropdownMenuLabel>
-                    {SEVERITY_OPTIONS.map((val) => (
-                        <DropdownMenuCheckboxItem
-                            key={val}
-                            checked={filter.severities.includes(val)}
-                            onCheckedChange={() => toggleSeverity(val)}
-                        >
-                            {SeverityLabel[val]}
-                        </DropdownMenuCheckboxItem>
-                    ))}
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuLabel>Status</DropdownMenuLabel>
-                    {STATUS_OPTIONS.map((val) => (
-                        <DropdownMenuCheckboxItem
-                            key={val}
-                            checked={filter.statuses.includes(val)}
-                            onCheckedChange={() => toggleStatus(val)}
-                        >
-                            {StatusMetadata[val].label}
-                        </DropdownMenuCheckboxItem>
-                    ))}
-                </DropdownMenuGroup>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    )
 
     return (
         <ApplicationShell>
@@ -395,26 +440,9 @@ function Page() {
                                     </div>
                                 </div>
 
-                                <section className="flex flex-col gap-2">
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        {filterDropdown}
-                                        {filter.severities.length > 0 && (
-                                            <FilterChip
-                                                field="Severity"
-                                                onClear={() => setFilter((prev) => ({ ...prev, severities: [] }))}
-                                                values={filter.severities.map((val) => SeverityLabel[val])}
-                                            />
-                                        )}
-                                        {filter.statuses.length > 0 && (
-                                            <FilterChip
-                                                field="Status"
-                                                onClear={() => setFilter((prev) => ({ ...prev, statuses: [] }))}
-                                                values={filter.statuses.map((val) => StatusMetadata[val].label)}
-                                            />
-                                        )}
-                                    </div>
-                                    <ThreadsTable emptyLabel="No active threads" onSelect={(id) => router.push(`/c/${id}`)} rows={filterThreads(activeThreads)} />
-                                </section>
+                                <Suspense fallback={<ThreadsTable emptyLabel="No active threads" onSelect={(id) => router.push(`/c/${id}`)} rows={activeThreads} />}>
+                                    <FilteredThreads onSelect={(id) => router.push(`/c/${id}`)} threads={activeThreads} />
+                                </Suspense>
 
                                 {/* <section className="flex flex-col gap-2">
                                     <div className="flex items-center justify-between">
