@@ -4,7 +4,7 @@ import { use, useState } from 'react'
 
 import { BugIcon, ChevronDoubleLeftIcon, CloseIcon, CopyIcon, ForkIcon, GearIcon, PlusIcon, ReplyIcon, ShareIcon, SyncIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { usePanelRef } from 'react-resizable-panels'
 
 import { GenieCodeIcon } from '@/app/assets/icons/genie-code'
@@ -13,6 +13,7 @@ import { PanelRightOpenIcon } from '@/app/assets/icons/panel-right-open'
 
 import { ApplicationContent, ApplicationShell } from '@/components/app/application-shell'
 import { Chatbox } from '@/components/app/chatbox'
+import { InsightReport } from '@/components/app/insight-report'
 import { MessageContent } from '@/components/app/message-content'
 import { ThoughtBlock } from '@/components/app/thought-block'
 import Threads from '@/components/app/threads'
@@ -77,13 +78,30 @@ function Page({ params }: PageProps) {
     const [threadsOpen, setThreadsOpen] = useState(true)
     const threadsPanelRef = usePanelRef()
 
-    const { threads, messages, sendUserMessage, thinking } = useThreads()
+    const { addThread, threads, messages, sendUserMessage, thinking } = useThreads()
+
+    const searchParams = useSearchParams()
 
     const thread = threads.find((t) => t.id === threadId)
     const threadMessages = messages[threadId] ?? []
     const threadThinking = thinking[threadId] ?? null
     const lastMessage = threadMessages[threadMessages.length - 1]
     const latestAgentMessageId = lastMessage?.role === 'agent' ? lastMessage.id : undefined
+
+    // Research variant: `?view=report` renders the insight as a report page
+    // instead of a chat thread. Only meaningful for incident threads, which
+    // carry the structured fields the report presents.
+    const isReportView = searchParams.get('view') === 'report' && thread?.type === 'incident'
+    // The primary agent message carries the insight body + code changes.
+    const reportMessage = threadMessages.find((m) => m.role === 'agent')
+
+    // Floating suggestions docked at the bottom of the report; each opens a new
+    // thread (see handleReportSuggestion).
+    const reportSuggestions = [
+        { label: 'Draft a fix', prompt: 'Draft a fix for this insight', scenarioId: 'report-draft-fix' },
+        { label: 'Explain root cause', prompt: 'Explain the root cause in plain language', scenarioId: 'report-explain-root-cause' },
+        { label: 'Open a PR', prompt: 'Open a PR with the fix', scenarioId: 'report-open-pr' },
+    ]
 
     const [showAutomationPanel, setShowAutomationPanel] = useState(false)
     const [showIncidentPanel, setShowIncidentPanel] = useState(false)
@@ -94,6 +112,23 @@ function Page({ params }: PageProps) {
 
     function handleSubmit(content: string) {
         sendUserMessage(threadId, content)
+    }
+
+    // Each report docked-bar suggestion opens a fresh thread seeded with its
+    // prompt; the matching scenario scripts the agent's reply.
+    function handleReportSuggestion(suggestion: { label: string; prompt: string; scenarioId: string }) {
+        const nowIso = new Date().toISOString()
+        const newThread: Thread = {
+            id: crypto.randomUUID(),
+            label: suggestion.label,
+            type: 'automation',
+            scenario_id: suggestion.scenarioId,
+            created_at: nowIso,
+            updated_at: nowIso,
+        }
+        addThread(newThread)
+        sendUserMessage(newThread.id, suggestion.prompt)
+        router.push(`/c/${newThread.id}`)
     }
 
     function handleThreadsToggle() {
@@ -206,6 +241,47 @@ function Page({ params }: PageProps) {
                                 </Button>
                             </div>
                         </div>
+                        {isReportView && thread ? (
+                            <div className="flex flex-col flex-1 min-h-0">
+                                <div className="flex-1 min-h-0 overflow-y-auto">
+                                    <div className="p-6 pb-2">
+                                        <InsightReport thread={thread} message={reportMessage} onAction={handleSubmit} />
+                                    </div>
+                                </div>
+                                {/* Docked suggestion bar — floats above the report, opens new threads */}
+                                <div className="bg-[rgb(255,255,255)] dark:bg-[rgb(17,23,28)] border-t shrink-0">
+                                    <div className="items-center flex flex-wrap max-w-3xl mx-auto gap-2 px-6 py-3">
+                                        <svg aria-hidden className="absolute" height="0" width="0">
+                                            <defs>
+                                                <linearGradient
+                                                    gradientUnits="userSpaceOnUse"
+                                                    id="reply-icon-gradient"
+                                                    x1="-1.16831"
+                                                    x2="12.4619"
+                                                    y1="1.18452"
+                                                    y2="18.6312"
+                                                >
+                                                    <stop offset="0.235" stopColor="#4299E0" />
+                                                    <stop offset="0.47" stopColor="#CA42E0" />
+                                                    <stop offset="0.76" stopColor="#FF5F46" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                        {reportSuggestions.map((suggestion) => (
+                                            <Button
+                                                className="items-center bg-[rgb(246,247,249)] dark:bg-[rgb(31,39,45)] rounded-[12px] rounded-tl-none text-[13px] leading-[20px] gap-1.5 w-fit"
+                                                key={suggestion.label}
+                                                onClick={() => handleReportSuggestion(suggestion)}
+                                                variant="secondary"
+                                            >
+                                                <ReplyIcon className="size-3.5 [&_path]:[stroke:url(#reply-icon-gradient)]" />
+                                                <span>{suggestion.label}</span>
+                                            </Button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
                         <div className="flex-1 min-h-0 overflow-y-auto ">
                             <div className="flex flex-col min-h-full">
                                 <div
@@ -379,6 +455,7 @@ function Page({ params }: PageProps) {
                                 </div>
                             </div>
                         </div>
+                        )}
                     </ResizablePanel>
                     {(showAutomationPanel || showIncidentPanel) && (
                         <>

@@ -284,4 +284,34 @@ export const defaultThreads: Thread[] = [
         created_at: '2026-04-14T10:00:00+00:00',
         updated_at: '2026-04-14T10:04:00+00:00',
     },
+    // Automation-run threads — each scheduled task run produces its own thread.
+    // Surfaced in the /c/inbox/unified central inbox alongside insights.
+    {
+        id: 'run-0001',
+        label: 'Nightly SLA freshness watcher',
+        type: 'automation',
+        created_at: '2026-04-20T02:00:00+00:00',
+        updated_at: '2026-04-20T02:00:00+00:00',
+    },
+    {
+        id: 'run-0002',
+        label: 'Schema drift monitor',
+        type: 'automation',
+        created_at: '2026-04-20T15:00:00+00:00',
+        updated_at: '2026-04-20T15:00:00+00:00',
+    },
+    {
+        id: 'run-0003',
+        label: 'Deprecated runtime scanner',
+        type: 'automation',
+        created_at: '2026-04-20T15:20:00+00:00',
+        updated_at: '2026-04-20T15:20:00+00:00',
+    },
+    {
+        id: 'run-0004',
+        label: 'Cost anomaly sweep',
+        type: 'automation',
+        created_at: '2026-04-20T11:30:00+00:00',
+        updated_at: '2026-04-20T11:30:00+00:00',
+    },
 ]
