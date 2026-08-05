@@ -18,6 +18,17 @@ export interface Thread {
 
 const initiallyUnreadThreadId = '11111111-0000-0000-0000-000000000012'
 
+const resolvedInsightTimestamps: Record<string, string> = {
+    '11111111-0000-0000-0000-000000000004': '2026-04-20T06:13:00+00:00',
+    '11111111-0000-0000-0000-000000000005': '2026-04-20T06:21:00+00:00',
+    '11111111-0000-0000-0000-000000000006': '2026-04-20T07:45:00+00:00',
+    '11111111-0000-0000-0000-000000000007': '2026-04-20T08:28:00+00:00',
+    '11111111-0000-0000-0000-000000000008': '2026-04-20T09:13:00+00:00',
+    '11111111-0000-0000-0000-000000000009': '2026-04-20T09:40:00+00:00',
+    '11111111-0000-0000-0000-000000000010': '2026-04-20T10:08:00+00:00',
+    '11111111-0000-0000-0000-000000000011': '2026-04-20T10:20:00+00:00',
+}
+
 const seededThreads: Thread[] = [
     {
         id: '11111111-0000-0000-0000-000000000012',
@@ -79,6 +90,7 @@ const seededThreads: Thread[] = [
         ],
         reported_by: 'Genie ZeroOps',
         root_cause_summary: 'The current Spark Declarative Pipeline combines too many real-time responsibilities in a single streaming workflow: reading raw fan interaction events from ZeroBus, resolving fan identity, joining profile attributes, maintaining state for late-arriving events, and writing to Lakebase. During high-volume match windows the enrichment step creates high-cardinality state, causing the pipeline to fall behind. Once the stream falls behind, Lakebase write retries compound end-to-end latency. The pipeline appears partially healthy at the job level but fails the real-time product requirement.',
+        scenario_id: 'fan-interaction-commit-push',
         updated_at: '2026-04-20T15:24:00+00:00',
     },
     {
@@ -94,7 +106,7 @@ const seededThreads: Thread[] = [
             { description: 'Executor logs parsed', detail: '11 `FetchFailedException`s across 3 stages, all referencing the same target host.', status: 'completed', timestamp: '2026-04-20T10:12:00+00:00' },
             { description: 'Host eviction timeline reconstructed', detail: 'Worker `ip-10-0-4-87` was reclaimed by EC2 spot eviction at 09:47 UTC, mid-shuffle write of stage 14.', status: 'completed', timestamp: '2026-04-20T10:14:00+00:00' },
             { description: 'Spark conf fix prepared', detail: 'Raised network timeout and shuffle retry budget so transient host loss is recoverable.', status: 'current', timestamp: '2026-04-20T10:16:00+00:00' },
-            { description: 'PR opened', status: 'pending', timestamp: '2026-04-20T10:18:00+00:00' },
+            { description: 'Changes committed and pushed', status: 'pending', timestamp: '2026-04-20T10:18:00+00:00' },
         ],
         reported_by: 'Genie ZeroOps: Debug Databricks Job Failures',
         root_cause_summary: 'Shuffle fetch retries are a symptom — a spot worker was evicted mid-shuffle and the shuffle service could not recover its blocks from the dead host.',
@@ -112,7 +124,7 @@ const seededThreads: Thread[] = [
             { description: 'Schema drift detected', detail: 'Upstream `claims.policy_id` column type changed from INT to STRING.', status: 'completed', timestamp: '2026-04-20T10:00:00+00:00' },
             { description: 'Failed joins isolated', detail: '3 downstream jobs failing at the join with `policies` on `policy_id`.', status: 'completed', timestamp: '2026-04-20T10:02:00+00:00' },
             { description: 'Fix prepared', detail: 'Cast-based fix drafted; ready for review.', status: 'current', timestamp: '2026-04-20T10:05:00+00:00' },
-            { description: 'PR opened', status: 'pending', timestamp: '2026-04-20T10:06:00+00:00' },
+            { description: 'Changes committed and pushed', status: 'pending', timestamp: '2026-04-20T10:06:00+00:00' },
         ],
         reported_by: 'Genie ZeroOps: Debug Databricks Job Failures',
         root_cause_summary: 'Upstream `claims_raw.policyholder_id` was changed from INT to STRING; downstream joins fail with type mismatch.',
@@ -165,7 +177,7 @@ const seededThreads: Thread[] = [
                 timestamp: '2026-04-20T09:35:00+00:00',
             },
             {
-                description: 'PRs opened',
+                description: 'Changes committed and pushed',
                 detail: 'Pending reviewer sign-off before merge.',
                 status: 'pending',
                 timestamp: '2026-04-20T09:36:00+00:00',
@@ -319,6 +331,28 @@ const seededThreads: Thread[] = [
     },
 ]
 
-export const defaultThreads: Thread[] = seededThreads.map((thread) =>
-    thread.id === initiallyUnreadThreadId ? thread : { ...thread, read_at: thread.updated_at }
-)
+export const defaultThreads: Thread[] = seededThreads.map((thread) => {
+    const resolvedAt = resolvedInsightTimestamps[thread.id]
+    const resolvedThread: Thread = resolvedAt
+        ? {
+              ...thread,
+              progress_updates: [
+                  ...(thread.progress_updates ?? []).map((update) => ({
+                      ...update,
+                      status: 'completed' as const,
+                  })),
+                  {
+                      description: 'Changes committed and pushed',
+                      status: 'completed',
+                      timestamp: resolvedAt,
+                  },
+              ],
+              status: 'resolved',
+              updated_at: resolvedAt,
+          }
+        : thread
+
+    return resolvedThread.id === initiallyUnreadThreadId
+        ? resolvedThread
+        : { ...resolvedThread, read_at: resolvedThread.updated_at }
+})

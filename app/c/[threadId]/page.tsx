@@ -129,7 +129,7 @@ function Page({ params }: PageProps) {
     const reportSuggestions = [
         { label: 'Draft a fix', prompt: 'Draft a fix for this insight', scenarioId: 'report-draft-fix' },
         { label: 'Explain root cause', prompt: 'Explain the root cause in plain language', scenarioId: 'report-explain-root-cause' },
-        { label: 'Open a PR', prompt: 'Open a PR with the fix', scenarioId: 'report-open-pr' },
+        { label: 'Commit and push', prompt: 'Commit and push the fix', scenarioId: 'report-open-pr' },
     ]
 
     // The latest prepared file changes in this thread, surfaced as docked state

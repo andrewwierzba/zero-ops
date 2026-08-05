@@ -48,11 +48,24 @@ export const scenarios: Record<string, Scenario> = {
         id: 'claims-schema-drift-pr',
         steps: [
             {
-                promptMatch: 'create pull request',
+                promptMatch: 'commit and push',
                 thoughtDurationMs: 2000,
                 reply: {
                     content:
-                        'PR created.\n\n- Branch: `fix/cast-policyholder-id-to-string`\n- Commit: `a3f5b9c`\n- PR link: [#482 Cast policyholder_id to STRING in claims enrichment join](#)',
+                        'Committed and pushed the validated change.\n\n- Branch: `fix/cast-policyholder-id-to-string`\n- Commit: `a3f5b9c`\n- PR: [Open PR](#)',
+                },
+            },
+        ],
+    },
+    'fan-interaction-commit-push': {
+        id: 'fan-interaction-commit-push',
+        steps: [
+            {
+                promptMatch: 'commit and push',
+                thoughtDurationMs: 3000,
+                reply: {
+                    content:
+                        'Committed and pushed the validated change.\n\n- Branch: `perf/fan-interaction-staged-streaming`\n- Commit: `5e2af71`\n- PR: [Open PR](#)',
                 },
             },
         ],
@@ -67,8 +80,8 @@ export const scenarios: Record<string, Scenario> = {
                 thoughtDurationMs: 3000,
                 reply: {
                     content:
-                        "Here's a fix drafted from the report's root cause.\n\nI've prepared a minimal change scoped to the affected assets, validated it against a sandbox run, and confirmed the output matches production. Review the diff and I can open a PR when you're ready.",
-                    suggestions: [{ label: 'Create pull request' }],
+                        "Here's a fix drafted from the report's root cause.\n\nI've prepared a minimal change scoped to the affected assets, validated it against a sandbox run, and confirmed the output matches production. Review the diff and I can commit and push it when you're ready.",
+                    suggestions: [{ label: 'Commit and push' }],
                 },
             },
         ],
@@ -90,11 +103,11 @@ export const scenarios: Record<string, Scenario> = {
         id: 'report-open-pr',
         steps: [
             {
-                promptMatch: 'open a pr with the fix',
+                promptMatch: 'commit and push the fix',
                 thoughtDurationMs: 3000,
                 reply: {
                     content:
-                        'PR opened.\n\n- Branch: `fix/zeroops-suggested-change`\n- Status: awaiting review\n- I linked it back to this insight so the status updates when it merges.',
+                        'Committed and pushed the validated change.\n\n- Branch: `fix/zeroops-suggested-change`\n- PR: [Open PR](#)\n\nI linked it back to this insight so the status updates once the change merges.',
                 },
             },
         ],

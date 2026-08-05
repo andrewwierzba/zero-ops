@@ -1,5 +1,7 @@
 'use client'
 
+import { NewWindowIcon } from '@/lib/icons'
+
 import React from 'react'
 
 import { ChartEmbed, ChartEmbedMode } from '@/components/app/chart-embed'
@@ -78,11 +80,12 @@ function renderInlineTags(text: string, baseKey: number): React.ReactNode[] {
         } else {
             out.push(
                 <a
-                    className="text-[rgb(34,114,180)] dark:text-[rgb(138,202,255)] hover:underline"
+                    className="text-[rgb(34,114,180)] dark:text-[rgb(138,202,255)] hover:underline inline-flex items-center gap-1"
                     href={match[6]}
                     key={key}
                 >
                     {match[5]}
+                    <NewWindowIcon className="size-3" />
                 </a>
             )
         }

@@ -1,4 +1,8 @@
+import { CloudUploadIcon } from '@/lib/icons'
+
 import { GitPullRequestIcon } from 'lucide-react'
+
+import type { ComponentType } from 'react'
 
 export interface ThoughtStep {
     content?: string
@@ -38,7 +42,7 @@ export interface CodeChangeFile {
 }
 
 export interface CodeChangeAction {
-    icon?: typeof GitPullRequestIcon
+    icon?: ComponentType<{ className?: string }>
     label: string
     variant?: 'primary' | 'secondary' | 'destructive'
 }
@@ -62,7 +66,65 @@ const defaultAgentActions: MessageAction[] = [
     { icon: 'copy_debug', label: 'Copy debug info' },
 ]
 
-export const defaultMessages: ThreadMessages[] = [
+interface InsightResolution {
+    branch: string
+    commit: string
+    promptAt: string
+    resolvedAt: string
+}
+
+const insightResolutions: Record<string, InsightResolution> = {
+    '11111111-0000-0000-0000-000000000004': {
+        branch: 'perf/churn-feature-pruning',
+        commit: '6ac91de',
+        promptAt: '2026-04-20T06:11:00+00:00',
+        resolvedAt: '2026-04-20T06:13:00+00:00',
+    },
+    '11111111-0000-0000-0000-000000000005': {
+        branch: 'chore/upgrade-jobs-dbr-17',
+        commit: 'e14c7a3',
+        promptAt: '2026-04-20T06:19:00+00:00',
+        resolvedAt: '2026-04-20T06:21:00+00:00',
+    },
+    '11111111-0000-0000-0000-000000000006': {
+        branch: 'fix/customer-id-string-joins',
+        commit: 'b62e8f4',
+        promptAt: '2026-04-20T07:43:00+00:00',
+        resolvedAt: '2026-04-20T07:45:00+00:00',
+    },
+    '11111111-0000-0000-0000-000000000007': {
+        branch: 'fix/marketing-events-freshness',
+        commit: 'd93b6c2',
+        promptAt: '2026-04-20T08:26:00+00:00',
+        resolvedAt: '2026-04-20T08:28:00+00:00',
+    },
+    '11111111-0000-0000-0000-000000000008': {
+        branch: 'fix/customer-360-uc-reference',
+        commit: 'c71a4e9',
+        promptAt: '2026-04-20T09:11:00+00:00',
+        resolvedAt: '2026-04-20T09:13:00+00:00',
+    },
+    '11111111-0000-0000-0000-000000000009': {
+        branch: 'fix/etl-sales-daily-sla',
+        commit: '8f2c1ad',
+        promptAt: '2026-04-20T09:38:00+00:00',
+        resolvedAt: '2026-04-20T09:40:00+00:00',
+    },
+    '11111111-0000-0000-0000-000000000010': {
+        branch: 'fix/cast-policyholder-id-to-string',
+        commit: 'a3f5b9c',
+        promptAt: '2026-04-20T10:06:00+00:00',
+        resolvedAt: '2026-04-20T10:08:00+00:00',
+    },
+    '11111111-0000-0000-0000-000000000011': {
+        branch: 'fix/etl-orders-shuffle-recovery',
+        commit: '4d8c2f1',
+        promptAt: '2026-04-20T10:18:00+00:00',
+        resolvedAt: '2026-04-20T10:20:00+00:00',
+    },
+}
+
+const seededMessages: ThreadMessages[] = [
     {
         threadId: '11111111-0000-0000-0000-000000000012',
         messages: [
@@ -236,7 +298,7 @@ Split the monolithic stream into 4 staged streaming components:
                 role: 'agent',
                 suggestions: [
                     { label: 'Show full analysis' },
-                    { label: 'Create pull request' },
+                    { label: 'Commit and push' },
                 ],
                 thought: {
                     duration_ms: 142000,
@@ -303,7 +365,7 @@ Split the monolithic stream into 4 staged streaming components:
                 id: 'msg-0011-01',
                 role: 'agent',
                 suggestions: [
-                    { label: 'Create pull request' },
+                    { label: 'Commit and push' },
                 ],
                 thought: {
                     duration_ms: 64000,
@@ -385,7 +447,7 @@ Cast [[column:policyholder_id]] to STRING on the claims side before the enrichme
                 role: 'agent',
                 suggestions: [
                     { label: 'Show full analysis' },
-                    { label: 'Create pull request' },
+                    { label: 'Commit and push' },
                 ],
                 thought: {
                     duration_ms: 127000,
@@ -627,7 +689,7 @@ Found 13 affected assets: 3 jobs failing at the enrichment join, plus 10 downstr
                 id: 'msg-0004-05',
                 role: 'agent',
                 suggestions: [
-                    { label: 'Create pull request' },
+                    { label: 'Commit and push' },
                 ],
                 thought_duration_ms: 14000,
             },
@@ -713,7 +775,7 @@ Found 13 affected assets: 3 jobs failing at the enrichment join, plus 10 downstr
                 id: 'msg-0005-05',
                 role: 'agent',
                 suggestions: [
-                    { label: 'Create pull request' },
+                    { label: 'Commit and push' },
                 ],
                 thought_duration_ms: 12000,
             },
@@ -1054,7 +1116,7 @@ I analyzed the Spark execution plan and found 4 compounding performance issues. 
                 role: 'agent',
                 suggestions: [
                     { label: 'Show full analysis' },
-                    { label: 'Create pull request with fix' },
+                    { label: 'Commit and push' },
                 ],
                 thought: {
                     duration_ms: 118000,
@@ -1125,7 +1187,7 @@ The real problem is the job itself: it's gotten nearly 9x slower over the last 5
                 role: 'agent',
                 suggestions: [
                     { label: 'Show full analysis' },
-                    { label: 'Create pull request with fix' },
+                    { label: 'Commit and push' },
                 ],
                 thought_duration_ms: 14000,
             },
@@ -1154,7 +1216,7 @@ This is a gradual degradation, not a sudden failure — which is why no alerts f
                 id: 'msg-0009-05',
                 role: 'agent',
                 suggestions: [
-                    { label: 'Create pull request with fix' },
+                    { label: 'Commit and push' },
                 ],
                 thought_duration_ms: 26000,
             },
@@ -1177,7 +1239,7 @@ Each change passed code review individually. The performance cliff came from the
                 id: 'msg-0009-07',
                 role: 'agent',
                 suggestions: [
-                    { label: 'Create pull request with fix' },
+                    { label: 'Commit and push' },
                 ],
                 thought_duration_ms: 44000,
             },
@@ -1274,3 +1336,53 @@ Grant the automation's run-as principal \`SELECT\` on \`system.billing.usage\`, 
         ],
     },
 ]
+
+function updateCodeChangeActions(message: Message): Message {
+    if (!message.code_changes) return message
+
+    const codeChanges: Record<string, CodeChange> = Object.fromEntries(
+        Object.entries(message.code_changes).map(([id, change]) => [
+            id,
+            {
+                ...change,
+                actions: change.actions
+                    ?.filter((action) => action.label !== 'Review')
+                    .map((action) =>
+                        action.label.startsWith('Create pull request')
+                            ? { ...action, icon: CloudUploadIcon, label: 'Commit and push' }
+                            : action
+                    ),
+            },
+        ])
+    )
+
+    return { ...message, code_changes: codeChanges }
+}
+
+export const defaultMessages: ThreadMessages[] = seededMessages.map((threadMessages) => {
+    const messages = threadMessages.messages.map(updateCodeChangeActions)
+    const resolution = insightResolutions[threadMessages.threadId]
+    if (!resolution) return { ...threadMessages, messages }
+
+    const idSuffix = threadMessages.threadId.slice(-4)
+    return {
+        ...threadMessages,
+        messages: [
+            ...messages,
+            {
+                content: 'Commit and push',
+                created_at: resolution.promptAt,
+                id: `msg-${idSuffix}-commit-push-user`,
+                role: 'user',
+            },
+            {
+                actions: defaultAgentActions,
+                content: `Committed and pushed the validated change.\n\n- Branch: \`${resolution.branch}\`\n- Commit: \`${resolution.commit}\`\n- PR: [Open PR](#)`,
+                created_at: resolution.resolvedAt,
+                id: `msg-${idSuffix}-commit-push-agent`,
+                role: 'agent',
+                thought_duration_ms: 3000,
+            },
+        ],
+    }
+})
